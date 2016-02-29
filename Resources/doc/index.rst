@@ -8,7 +8,7 @@ A new instance of Model\Adapter class must be created than the fetchProducts() m
 list of product model classes defined in `Sylius Sync Bundle`_.
 
 The Sylius sync Bundle defines factory services that can be used to create the required model instances. Using them
- from inside a controller is straightforward as shown below. The last 5 parameters represents the .txt files exported by
+from inside a controller is straightforward as shown below. The last 5 parameters represents the .txt files exported by
 the `WebshopExperts`_' module configured in `sERPa`_.
 
 .. code-block:: php
