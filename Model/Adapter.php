@@ -108,16 +108,14 @@ class Adapter implements RemoteAdapterInterface
     {
         $res = [];
 
-        $taxonsData = Parser::create()->parseTaxonomies($this->taxonomiesFile);
+        $taxonomiesData = Parser::create()->parseTaxonomies($this->taxonomiesFile);
         $mapper = Mapper::create();
 
-        foreach ($taxonsData as $data) {
+        foreach ($taxonomiesData as $taxonomyData) {
             /** @var RemoteTaxonomyInterface $taxonomy */
-            $taxonomy = $this->taxonomyFactory->create();
-            $taxonomy = $mapper->mapTaxonomy($taxonomy, $data);
-            $taxons = $this->mapChildrenTaxons($data['children'], $taxonomy);
+            $taxonomy = $mapper->mapTaxonomy($this->taxonomyFactory->create(), $taxonomyData);
+            $taxons = $this->mapChildrenTaxons($taxonomyData['children'], $taxonomy);
             foreach ($taxons as $taxon) {
-                $taxon->setParent($taxonomy);
                 $taxon->setTaxonomy($taxonomy);
                 $taxonomy->addTaxon($taxon);
             }
