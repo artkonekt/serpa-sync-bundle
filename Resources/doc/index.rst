@@ -5,11 +5,11 @@ Usage In Client Code
 --------------------
 
 A new instance of Model\Adapter class must be created than the fetchProducts() method must be called. It will return a
-list of product model classes defined in _Sylius Sync Bundle: https://github.com/artkonekt/sylius-sync-bundle .
+list of product model classes defined in `Sylius Sync Bundle`_.
 
 The Sylius sync Bundle defines factory services that can be used to create the required model instances. Using them
  from inside a controller is straightforward as shown below. The last 5 parameters represents the .txt files exported by
-the [WebshopExperts](http://www.progen.hu/serpa/help/wk_webxhopexpertsinformacio.htm)'s module configured in [sERPa](https://www.progen.hu).
+the `WebshopExperts`_' module configured in `sERPa`_.
 
 .. code-block:: php
 
@@ -39,3 +39,7 @@ the [WebshopExperts](http://www.progen.hu/serpa/help/wk_webxhopexpertsinformacio
     }
 
 Adapter methods related to taxonomies and stocks still to be implemented.
+
+.. _Sylius Sync Bundle: https://github.com/artkonekt/sylius-sync-bundle
+.. _WebshopExperts: http://www.progen.hu/serpa/help/wk_webxhopexpertsinformacio.htm
+.. _sERPa: https://www.progen.hu
