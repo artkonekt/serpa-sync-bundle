@@ -23,11 +23,11 @@ the `WebshopExperts`_' module configured in `sERPa`_.
                 $this->get('konekt_sylius_sync.remote_product.factory'),
                 $this->get('konekt_sylius_sync.remote_image.factory'),
                 $this->get('konekt_sylius_sync.remote_taxonomy.factory'),
-                '/home/sanyi/Documents/ginnet/serpa-export-data/Termek.txt',
-                '/home/sanyi/Documents/ginnet/serpa-export-data/TermekAR.txt',
-                '/home/sanyi/Documents/ginnet/serpa-export-data/TermekFa.txt',
-                '/home/sanyi/Documents/ginnet/serpa-export-data/TermekKategoria.txt',
-                '/home/sanyi/Documents/ginnet/serpa-export-data/TermekKeszlet.txt'
+                '/location/Termek.txt',
+                '/location/TermekAR.txt',
+                '/location/TermekFa.txt',
+                '/location/TermekKategoria.txt',
+                '/location/TermekKeszlet.txt'
             );
 
             /** @var Konekt\SyliusSyncBundle\Model\Remote\Product\Product[] $products */
