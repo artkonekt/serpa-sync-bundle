@@ -40,20 +40,8 @@ class Adapter implements RemoteAdapterInterface
     /** @var  TaxonFactory */
     private $taxonFactory;
 
-    /** @var  string */
-    private $productsFile;
-
-    /** @var  string */
-    private $pricesFile;
-
-    /** @var  string */
-    private $taxonomiesFile;
-
-    /** @var  string */
-    private $attributesFile;
-
-    /** @var  string */
-    private $stocksFile;
+    /** @var  InputFiles */
+    private $inputFiles;
 
     /**
      * Creates a new instance of the class.
@@ -75,11 +63,7 @@ class Adapter implements RemoteAdapterInterface
         $this->imagefactory = $imageFactory;
         $this->taxonomyFactory = $taxonomyFactory;
         $this->taxonFactory = $taxonFactory;
-        $this->productsFile = $productsFile;
-        $this->pricesFile = $pricesFile;
-        $this->taxonomiesFile = $taxonomiesFile;
-        $this->attributesFile = $attributesFile;
-        $this->stocksFile = $stocksFile;
+        $this->inputFiles = InputFiles::create($productsFile, $pricesFile, $taxonomiesFile, $attributesFile, $stocksFile);
     }
 
     /**
@@ -90,7 +74,8 @@ class Adapter implements RemoteAdapterInterface
     {
         $res = [];
 
-        $productsData = Parser::create()->parseProducts($this->productsFile, $this->pricesFile, $this->attributesFile);
+        $productsData = Parser::create()->parseProducts($this->inputFiles->getProductsFile(),
+            $this->inputFiles->getPricesFile(), $this->inputFiles->getAttributesFile());
         $mapper = Mapper::create();
 
         foreach ($productsData as $data) {
@@ -108,7 +93,7 @@ class Adapter implements RemoteAdapterInterface
     {
         $res = [];
 
-        $taxonomiesData = Parser::create()->parseTaxonomies($this->taxonomiesFile);
+        $taxonomiesData = Parser::create()->parseTaxonomies($this->inputFiles->getTaxonomiesFile());
         $mapper = Mapper::create();
 
         foreach ($taxonomiesData as $taxonomyData) {
