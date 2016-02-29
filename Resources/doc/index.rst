@@ -4,10 +4,10 @@ Konekt Serpa Sync Bundle
 Usage In Client Code
 --------------------
 
-A new instance of Model\Adapter class must be created than the fetchProducts() method must be called. It will return a
-list of product model classes defined in `Sylius Sync Bundle`_.
+A new instance of Model\Adapter class must be created than the fetchProducts() method can be called to return a
+list of product model classes defined in `Sylius Sync Bundle`_ out of .txt files exported by `sERPa`_.
 
-The Sylius sync Bundle defines factory services that can be used to create the required model instances. Using them
+The Sylius Sync Bundle defines factory services that can be used to create the required model instances. Using them
 from inside a controller is straightforward as shown below. The last 5 parameters represents the .txt files exported by
 the `WebshopExperts`_' module configured in `sERPa`_.
 
@@ -18,7 +18,7 @@ the `WebshopExperts`_' module configured in `sERPa`_.
 
         public function mainAction()
         {
-            /** @var Konekt\SerpaSyncBundle\Model\Adapter $products */
+            /** @var Konekt\SerpaSyncBundle\Model\Adapter $serpaAdapter */
             $serpaAdapter = new Konekt\SerpaSyncBundle\Model\Adapter(
                 $this->get('konekt_sylius_sync.remote_product.factory'),
                 $this->get('konekt_sylius_sync.remote_image.factory'),
