@@ -15,6 +15,10 @@ use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteAttributeInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteAttributeTranslationInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductTranslationInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyTranslationInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonTranslationInterface;
 
 /**
  * Maps data coming from sERPa to Sylius Sync Bundle models.
@@ -57,6 +61,42 @@ class Mapper
         }
 
         return $product;
+    }
+
+    /**
+     * Maps taxonomy data coming from sERPa to a Sync Bundle product instance.
+     *
+     * @param   RemoteTaxonomyInterface   $taxonomy   The Sync Bundle taxonomy instance.
+     * @param   array                     $data       The array containing the taxonomy data.
+     *
+     * @return RemoteProductInterface
+     */
+    public function mapTaxonomy(RemoteTaxonomyInterface $taxonomy, array $data)
+    {
+        $taxonomy->setId($data['ID']);
+        /** @var RemoteTaxonomyTranslationInterface $translation */
+        $translation = $taxonomy->getTranslation('hu', true);
+        $translation->setName($data['LevelNev']);
+
+        return $taxonomy;
+    }
+
+    /**
+     * Maps taxon data coming from sERPa to a Sync Bundle taxon instance.
+     *
+     * @param   RemoteTaxonInterface   $taxon   The Sync Bundle taxon instance.
+     * @param   array                  $data    The array containing the taxon data.
+     *
+     * @return RemoteProductInterface
+     */
+    public function mapTaxon(RemoteTaxonInterface $taxon, array $data)
+    {
+        $taxon->setId($data['ID']);
+        /** @var RemoteTaxonTranslationInterface $translation */
+        $translation = $taxon->getTranslation('hu', true);
+        $translation->setName($data['LevelNev']);
+
+        return $taxon;
     }
 
     /**

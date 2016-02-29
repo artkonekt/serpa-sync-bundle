@@ -15,10 +15,13 @@ use Konekt\SyliusSyncBundle\Model\Remote\Adapter\Konekt;
 use Konekt\SyliusSyncBundle\Model\Remote\Adapter\RemoteAdapterInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonFactory;
 
 /**
- * Represents the sERPa interface adapter implementation defined in Sylius Sync Bundle..
+ * Represents the sERPa interface adapter implementation defined in Sylius Sync Bundle.
  *
  * @package AppBundle\Model
  */
@@ -33,6 +36,9 @@ class Adapter implements RemoteAdapterInterface
 
     /** @var  TaxonomyFactory */
     private $taxonomyFactory;
+
+    /** @var  TaxonFactory */
+    private $taxonFactory;
 
     /** @var  string */
     private $productsFile;
@@ -55,18 +61,20 @@ class Adapter implements RemoteAdapterInterface
      * @param   ProductFactory    $productFactory    Factory service used to create products required by the sync bundle.
      * @param   ImageFactory      $imageFactory      Factory service used to create images required by the sync bundle.
      * @param   TaxonomyFactory   $taxonomyFactory   Factory service used to create taxonomies required by the sync bundle.
+     * @param   TaxonFactory      $taxonFactory      Factory service used to create taxons required by the sync bundle.
      * @param   string            $productsFile      The file containing the products exported by sERPa.
      * @param   string            $pricesFile        The file containing the product prices exported by sERPa.
      * @param   string            $taxonomiesFile    The file containing the taxonomy hierarchy exported by sERPa.
      * @param   string            $attributesFile    The file containing product attributes exported by sERPa.
      * @param   string            $stocksFile        The file containing product stocks exported by sERPa.
      */
-    public function __construct(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory,
+    public function __construct(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory, TaxonFactory $taxonFactory,
         $productsFile, $pricesFile, $taxonomiesFile, $attributesFile, $stocksFile)
     {
         $this->productFactory = $productFactory;
         $this->imagefactory = $imageFactory;
         $this->taxonomyFactory = $taxonomyFactory;
+        $this->taxonFactory = $taxonFactory;
         $this->productsFile = $productsFile;
         $this->pricesFile = $pricesFile;
         $this->taxonomiesFile = $taxonomiesFile;
@@ -98,7 +106,25 @@ class Adapter implements RemoteAdapterInterface
      */
     public function fetchTaxonomies()
     {
-        // TODO: Implement fetchTaxonomies() method.
+        $res = [];
+
+        $taxonsData = Parser::create()->parseTaxonomies($this->taxonomiesFile);
+        $mapper = Mapper::create();
+
+        foreach ($taxonsData as $data) {
+            /** @var RemoteTaxonomyInterface $taxonomy */
+            $taxonomy = $this->taxonomyFactory->create();
+            $taxonomy = $mapper->mapTaxonomy($taxonomy, $data);
+            $taxons = $this->mapChildrenTaxons($data['children'], $taxonomy);
+            foreach ($taxons as $taxon) {
+                $taxon->setParent($taxonomy);
+                $taxon->setTaxonomy($taxonomy);
+                $taxonomy->addTaxon($taxon);
+            }
+            $res[] = $taxonomy;
+        }
+
+        return $res;
     }
 
     /**
@@ -108,6 +134,34 @@ class Adapter implements RemoteAdapterInterface
     public function fetchTaxonomy($id)
     {
         // TODO: Implement fetchTaxonomy() method.
+    }
+
+    /**
+     * Recursively maps a list of taxon data arrays to taxon instances.
+     *
+     * @param   array                     $taxonsData   The array of taxons data containing the taxons to map.
+     * @param   RemoteTaxonomyInterface   $taxonomy     The taxonomy to which the taxon belongs directly or indirectly.
+     *
+     * @return  RemoteTaxonInterface[]
+     */
+    private function mapChildrenTaxons(array $taxonsData, RemoteTaxonomyInterface $taxonomy)
+    {
+        $res = [];
+        $mapper = Mapper::create();
+
+        foreach ($taxonsData as $taxonData) {
+            /** @var RemoteTaxonInterface $taxon */
+            $taxon = $mapper->mapTaxon($this->taxonFactory->create(), $taxonData);
+            /** @var RemoteTaxonInterface $childTaxon */
+            foreach ($this->fetchChildrenTaxons($taxonData['children']) as $childTaxon) {
+                $childTaxon->setParent($taxon);
+                $childTaxon->setTaxonomy($taxonomy);
+                $taxon->addChild($childTaxon);
+            }
+            $res[] = $taxon;
+        }
+
+        return $res;
     }
 
 }

@@ -23,6 +23,7 @@ the `WebshopExperts`_' module configured in `sERPa`_.
                 $this->get('konekt_sylius_sync.remote_product.factory'),
                 $this->get('konekt_sylius_sync.remote_image.factory'),
                 $this->get('konekt_sylius_sync.remote_taxonomy.factory'),
+                $this->get('konekt_sylius_sync.remote_taxon.factory'),
                 '/location/Termek.txt',
                 '/location/TermekAR.txt',
                 '/location/TermekFa.txt',
@@ -32,6 +33,9 @@ the `WebshopExperts`_' module configured in `sERPa`_.
 
             /** @var Konekt\SyliusSyncBundle\Model\Remote\Product\Product[] $products */
             $products = $serpaAdapter->fetchProducts();
+
+            /** @var Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxonomy[] $taxonomies */
+            $taxonomies = $serpaAdapter->fetchTaxonomies();
 
             return $this->render('your_template.html.twig');
         }

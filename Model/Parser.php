@@ -58,6 +58,20 @@ class Parser
     }
 
     /**
+     * Returns sERPa taxonomies as hierarchical arrays.
+     *
+     * @param   string   $taxonomiesFile   File containing taxonomies in sERPa format.
+     *
+     * @return  array
+     */
+    public function parseTaxonomies($taxonomiesFile)
+    {
+        $taxonomies = DataSource::create($taxonomiesFile)->getDataRows();
+
+        return $this->getTaxonChildrenByParentId(0, $taxonomies);
+    }
+
+    /**
      * Looks up a price information by a product SKU.
      *
      * @param   string       $sku
@@ -95,6 +109,24 @@ class Parser
         }
 
         return null;
+    }
+
+    private function getTaxonChildrenByParentId($parentId, array $rawTaxonomies)
+    {
+        $res = [];
+        foreach ($rawTaxonomies as $data) {
+            if ($parentId == $data['SzuloID']) {
+                $child = [
+                    'ID' => $data['ID'],
+                    'LevelNev' => $data['LevelNev'],
+                    'LevelLeiras' => $data['LevelLeiras']
+                ];
+                $child['children'] = $this->getChildrenByParentId($data['ID'], $rawTaxonomies);
+                $res[] = $child;
+            }
+        }
+
+        return $res;
     }
 
 }

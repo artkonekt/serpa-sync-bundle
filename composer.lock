@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkonekt/sylius-sync-bundle.git",
-                "reference": "bf8d4b17fa12334c816f4904213eb36c1bfb5b11"
+                "reference": "e269392b0b85ed03047f7c151935246f67f7f478"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkonekt/sylius-sync-bundle/zipball/bf8d4b17fa12334c816f4904213eb36c1bfb5b11",
-                "reference": "bf8d4b17fa12334c816f4904213eb36c1bfb5b11",
+                "url": "https://api.github.com/repos/artkonekt/sylius-sync-bundle/zipball/e269392b0b85ed03047f7c151935246f67f7f478",
+                "reference": "e269392b0b85ed03047f7c151935246f67f7f478",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
             "keywords": [
                 "sylius"
             ],
-            "time": "2016-02-26 13:20:56"
+            "time": "2016-02-29 11:52:12"
         }
     ],
     "packages-dev": [
