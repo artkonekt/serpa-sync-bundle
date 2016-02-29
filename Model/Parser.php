@@ -121,7 +121,7 @@ class Parser
                     'LevelNev' => $data['LevelNev'],
                     'LevelLeiras' => $data['LevelLeiras']
                 ];
-                $child['children'] = $this->getChildrenByParentId($data['ID'], $rawTaxonomies);
+                $child['children'] = $this->getTaxonChildrenByParentId($data['ID'], $rawTaxonomies);
                 $res[] = $child;
             }
         }

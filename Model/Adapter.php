@@ -153,7 +153,8 @@ class Adapter implements RemoteAdapterInterface
             /** @var RemoteTaxonInterface $taxon */
             $taxon = $mapper->mapTaxon($this->taxonFactory->create(), $taxonData);
             /** @var RemoteTaxonInterface $childTaxon */
-            foreach ($this->fetchChildrenTaxons($taxonData['children']) as $childTaxon) {
+            $childTaxons = $this->mapChildrenTaxons($taxonData['children'], $taxonomy);
+            foreach ($childTaxons as $childTaxon) {
                 $childTaxon->setParent($taxon);
                 $childTaxon->setTaxonomy($taxonomy);
                 $taxon->addChild($childTaxon);
