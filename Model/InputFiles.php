@@ -6,105 +6,90 @@
  * @author      Sandor Teglas
  * @license     MIT
  * @since       2016-02-29
- * @version     2016-02-29
+ * @version     2016-03-01
  */
 
 namespace Konekt\SerpaSyncBundle\Model;
 
+use Konekt\SerpaSyncBundle\Model\Exception\DuplicateInputFileName;
+use Konekt\SerpaSyncBundle\Model\Exception\InvalidInputFile;
+
 /**
- * Represents the files exported by sERPa.
+ * Represents a list of files exported by sERPa.
  *
  */
 class InputFiles
 {
 
-    /** @var  string */
-    private $productsFile;
-
-    /** @var  string */
-    private $pricesFile;
-
-
-    /** @var  string */
-    private $taxonomiesFile;
-
-    /** @var  string */
-    private $attributesFile;
-
-    /** @var  string */
-    private $stocksFile;
+    /** @var  string  Holds file paths by file names as keys. */
+    private $files = [];
 
     /**
      * Creates a new instance of the class.
      *
-     * @param   string   $productsFile      The file containing the products exported by sERPa.
-     * @param   string   $pricesFile        The file containing the product prices exported by sERPa.
-     * @param   string   $taxonomiesFile    The file containing the taxonomy hierarchy exported by sERPa.
-     * @param   string   $attributesFile    The file containing product attributes exported by sERPa.
-     * @param   string   $stocksFile        The file containing product stocks exported by sERPa.
+     * @param   array   $files   The list of files exported by sERPa.
      *
      * @return  static
      */
-    public static function create($productsFile, $pricesFile, $taxonomiesFile, $attributesFile, $stocksFile)
+    public static function create(array $files)
     {
         $instance = new static();
-        $instance->productsFile = $productsFile;
-        $instance->pricesFile = $pricesFile;
-        $instance->taxonomiesFile = $taxonomiesFile;
-        $instance->attributesFile = $attributesFile;
-        $instance->stocksFile = $stocksFile;
+
+        foreach ($files as $file) {
+            $instance->import($file);
+        }
 
         return $instance;
     }
 
     /**
-     * Returns the file containing products exported by sERPa.
+     * Returns true if a file exists, false otherwise.
      *
-     * @return string
+     * @param $fileName The name of the file whose existence to check.
+     *
+     * @return bool
      */
-    public function getProductsFile()
+    public function fileExists($fileName)
     {
-        return $this->productsFile;
+        return array_key_exists($fileName, $this->files);
     }
 
     /**
-     * Returns the file containing product pricess exported by sERPa.
+     * Gets the file path by its name or null if the file does not exist.
      *
-     * @return string
+     * @param $fileName The file name identifying the file.
+     *
+     * @return null|string
      */
-    public function getPricesFile()
+    public function getFile($fileName)
     {
-        return $this->pricesFile;
+        return $this->fileExists($fileName) ? $this->files[$fileName] : null;
     }
 
     /**
-     * Returns the file containing the taxonomy hierarchy exported by sERPa.
+     * Imports a file. The file name will be stored as the key, the parameter as the value.
      *
-     * @return string
+     * @param $file The file name with or without path information.
+     *
+     * @throws InvalidInputFile  When the file name could not be determined.
+     * @throws DuplicateInputFileName  When a file with this name was already added.
      */
-    public function getTaxonomiesFile()
+    private function import($file)
     {
-        return $this->taxonomiesFile;
-    }
+        // Making sure we always have a string
+        $stringFile = trim($file);
 
-    /**
-     * Returns the file containing product attributes exported by sERPa.
-     *
-     * @return string
-     */
-    public function getAttributesFile()
-    {
-        return $this->attributesFile;
-    }
+        $key = pathinfo($stringFile ,PATHINFO_BASENAME);
 
-    /**
-     * Returns the file containing product stocks exported by sERPa.
-     *
-     * @return string
-     */
-    public function getStocksFile()
-    {
-        return $this->stocksFile;
+        if (0 == strlen(trim($key))) {
+            throw new InvalidInputFile("File name could not be extracted from $stringFile.");
+        }
+
+        if ($this->fileExists()) {
+            throw new DuplicateInputFileName("File $key was already added.");
+        }
+
+        $this->files[$key] = $file;
     }
 
 }
