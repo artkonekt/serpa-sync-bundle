@@ -85,7 +85,7 @@ class InputFiles
             throw new InvalidInputFile("File name could not be extracted from $stringFile.");
         }
 
-        if ($this->fileExists()) {
+        if ($this->fileExists($key)) {
             throw new DuplicateInputFileName("File $key was already added.");
         }
 

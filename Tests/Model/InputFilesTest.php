@@ -74,7 +74,7 @@ class InputFilesTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidFile()
     {
-        $this->setExpectedException('InvalidInputFile');
+        $this->setExpectedException('Konekt\SerpaSyncBundle\Model\Exception\InvalidInputFile');
 
         InputFiles::create([
             '/path/to/'
@@ -84,7 +84,7 @@ class InputFilesTest extends \PHPUnit_Framework_TestCase
 
     public function testDuplicateFile()
     {
-        $this->setExpectedException('DuplicateInputFileName');
+        $this->setExpectedException('Konekt\SerpaSyncBundle\Model\Exception\DuplicateInputFileName');
 
         InputFiles::create([
             '/path/to/file1.txt',
