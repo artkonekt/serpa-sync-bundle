@@ -47,6 +47,7 @@ class InputFilesTest extends \PHPUnit_Framework_TestCase
             '/path/to/file3.txt',
         ]);
 
+
         $this->assertTrue($instance->fileExists('File2.txt'));
     }
 
