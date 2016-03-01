@@ -24,6 +24,7 @@ class InputFiles
     /** @var  string */
     private $pricesFile;
 
+
     /** @var  string */
     private $taxonomiesFile;
 
