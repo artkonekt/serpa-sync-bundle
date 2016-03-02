@@ -13,8 +13,10 @@ namespace Konekt\SerpaSyncBundle\Model\Adapter;
 
 use Konekt\SerpaSyncBundle\Model\AbstractAdapter;
 use Konekt\SerpaSyncBundle\Model\Parser\WebshopExperts\ProductParser;
+use Konekt\SerpaSyncBundle\Model\Parser\WebshopExperts\StockParser;
 use Konekt\SerpaSyncBundle\Model\Parser\WebshopExperts\TaxonomyParser;
 use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\ProductTranslator;
+use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\StockTranslator;
 use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\TaxonomyTranslator;
 
 /**
@@ -64,4 +66,19 @@ class WebshopExpertsAdapter extends AbstractAdapter
         return TaxonomyTranslator::create($this->getRemoteFactories());
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getStockParser()
+    {
+        return StockParser::create($this->getInputFiles());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStockTranslator()
+    {
+        return StockTranslator::create($this->getRemoteFactories());
+    }
 }

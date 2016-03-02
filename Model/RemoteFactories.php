@@ -110,7 +110,7 @@ class RemoteFactories
      */
     public function getStockFactory()
     {
-        return $this->taxonFactory;
+        return $this->stockFactory;
     }
 
 }

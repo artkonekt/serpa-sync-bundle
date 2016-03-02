@@ -5,15 +5,17 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-01
+ * @version     2016-03-02
  * @since       2016-03-01
  */
 
 namespace Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts;
 
 use Konekt\SerpaSyncBundle\Model\AbstractTranslator;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonTranslationInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxon;
-use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxonomy;
 use Sylius\Component\Taxonomy\Model\TaxonomyTranslation;
 
 class TaxonomyTranslator extends AbstractTranslator
@@ -24,10 +26,11 @@ class TaxonomyTranslator extends AbstractTranslator
      *
      * @param   array $data
      *
-     * @return  Taxonomy
+     * @return  RemoteTaxonomyInterface
      */
     public function translate(array $data)
     {
+        /** @var RemoteTaxonomyInterface $taxonomy */
         $taxonomy = $this->remoteFactories->getTaxonomyFactory()->create();
 
         $taxonomy->setId($data['ID']);
@@ -49,14 +52,14 @@ class TaxonomyTranslator extends AbstractTranslator
      *
      * @param   array $data
      *
-     * @return  Taxon
+     * @return  RemoteTaxonInterface
      */
     private function translateTaxon(array $data)
     {
         $taxon = $this->remoteFactories->getTaxonFactory()->create();
 
         $taxon->setId($data['ID']);
-        /** @var Taxon $translation */
+        /** @var RemoteTaxonTranslationInterface $translation */
         $translation = $taxon->getTranslation('hu', true);
         $translation->setName($data['LevelNev']);
 
@@ -66,12 +69,12 @@ class TaxonomyTranslator extends AbstractTranslator
     /**
      * Recursively translates a list of taxon data arrays to taxon instances.
      *
-     * @param   array      $data       The array of taxons data containing the taxons to map.
-     * @param   Taxonomy   $taxonomy   The taxonomy to which the taxon belongs directly or indirectly.
+     * @param   array                     $data       The array of taxons data containing the taxons to map.
+     * @param   RemoteTaxonomyInterface   $taxonomy   The taxonomy to which the taxon belongs directly or indirectly.
      *
-     * @return  Taxon[]
+     * @return  RemoteTaxonInterface[]
      */
-    private function translateTaxonsRecursively(array $data, Taxonomy $taxonomy)
+    private function translateTaxonsRecursively(array $data, RemoteTaxonomyInterface $taxonomy)
     {
         $taxons = [];
 

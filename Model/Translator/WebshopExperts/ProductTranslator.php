@@ -5,14 +5,14 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-01
+ * @version     2016-03-02
  * @since       2016-03-01
  */
 
 namespace Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts;
 
 use Konekt\SerpaSyncBundle\Model\AbstractTranslator;
-use Konekt\SyliusSyncBundle\Model\Remote\Product\Product;
+use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
 
 class ProductTranslator extends AbstractTranslator
 {
@@ -22,10 +22,11 @@ class ProductTranslator extends AbstractTranslator
      *
      * @param   array $data
      *
-     * @return  Product
+     * @return  RemoteProductInterface
      */
     public function translate(array $data)
     {
+        /** @var RemoteProductInterface $product */
         $product = $this->remoteFactories->getProductFactory()->create();
 
         $this->translateProperties($product, $data['product']);
@@ -42,12 +43,12 @@ class ProductTranslator extends AbstractTranslator
     /**
      * Translates general product data.
      *
-     * @param   Product   $product
-     * @param   array     $data
+     * @param   RemoteProductInterface   $product
+     * @param   array                    $data
      *
-     * @return  Product
+     * @return  RemoteProductInterface
      */
-    private function translateProperties(Product $product, array $data)
+    private function translateProperties(RemoteProductInterface $product, array $data)
     {
         $product->setSku($data['TermekKod']);
         /** @var RemoteProductTranslationInterface $translation */
@@ -62,12 +63,12 @@ class ProductTranslator extends AbstractTranslator
     /**
      * Translates price information.
      *
-     * @param   Product   $product
-     * @param   array     $data
+     * @param   RemoteProductInterface   $product
+     * @param   array                    $data
      *
-     * @return  Product
+     * @return  RemoteProductInterface
      */
-    private function translatePriceInfo(Product $product, array $data)
+    private function translatePriceInfo(RemoteProductInterface $product, array $data)
     {
         if ('0' == $data['AkciosAr']) {
             $product->setPrice($data['Ar']);
@@ -83,12 +84,12 @@ class ProductTranslator extends AbstractTranslator
     /**
      * Translates product attributes.
      *
-     * @param   Product   $product
-     * @param   array     $data
+     * @param   RemoteProductInterface   $product
+     * @param   array                    $data
      *
-     * @return  Product
+     * @return  RemoteProductInterface
      */
-    private function translateAttributes(Product $product, array $data)
+    private function translateAttributes(RemoteProductInterface $product, array $data)
     {
         foreach ($data as $key => $value) {
             /** @var RemoteAttributeInterface $attribute */

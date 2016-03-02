@@ -17,6 +17,7 @@ use Konekt\SyliusSyncBundle\Model\Remote\Adapter\RemoteAdapterInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Stock\RemoteStockInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Stock\StockFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonFactory;
@@ -124,9 +125,9 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     abstract public function getProductParser();
 
     /**
-     * Returns the translator that translates data loaded by the parser into Sylius Sync Bundle remote product instances.
+     * Returns the translator that translates product data loaded by the parser into Sylius Sync Bundle remote product instances.
      *
-     * @return AbstractParser
+     * @return AbstractTranslator
      */
     abstract public function getProductTranslator();
 
@@ -138,11 +139,25 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     abstract public function getTaxonomyParser();
 
     /**
-     * Returns the translator that translates data loaded by the parser into Sylius Sync Bundle remote taxonomy instances.
+     * Returns the translator that translates taxonomy data loaded by the parser into Sylius Sync Bundle remote taxonomy instances.
+     *
+     * @return AbstractTranslator
+     */
+    abstract public function getTaxonomyTranslator();
+
+    /**
+     * Returns the parser that loads stock data from files exported by sERPa.
      *
      * @return AbstractParser
      */
-    abstract public function getTaxonomyTranslator();
+    abstract public function getStockParser();
+
+    /**
+     * Returns the translator that translates stock data loaded by the parser into Sylius Sync Bundle remote stock instances.
+     *
+     * @return AbstractTranslator
+     */
+    abstract public function getStockTranslator();
 
     /**
      * Loads the products from sERPa exported files as Sylius Sync Bundle remote model product instances.
@@ -167,6 +182,16 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     public function fetchTaxonomy($id)
     {
 
+    }
+
+    /**
+     * Loads the stocks from sERPa exported files as Sylius Sync Bundle remote model stock instances.
+     *
+     * @return RemoteStockInterface
+     */
+    public function fetchStocks()
+    {
+        return $this->translate($this->getStockParser(), $this->getStockTranslator());
     }
 
 }
