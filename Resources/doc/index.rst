@@ -24,6 +24,7 @@ Using the `WebshopExperts`_'s implementation should be made as follows:
     use Konekt\SerpaSyncBundle\Model\Adapter\WebshopExpertsAdapter;
     use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
     use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
+    use Konekt\SyliusSyncBundle\Model\Remote\Stock\RemoteStockInterface;
 
     ...
 
@@ -40,6 +41,7 @@ Using the `WebshopExperts`_'s implementation should be made as follows:
                 $this->get('konekt_sylius_sync.remote_image.factory'),
                 $this->get('konekt_sylius_sync.remote_taxonomy.factory'),
                 $this->get('konekt_sylius_sync.remote_taxon.factory'),
+                $this->get('konekt_sylius_sync.remote_stock.factory'),
                 [
                     '/path/to/serpa/webshop_experts_data/Termek.txt',
                     '/path/to/serpa/webshop_experts_data/TermekAR.txt',
@@ -52,8 +54,14 @@ Using the `WebshopExperts`_'s implementation should be made as follows:
         /** @var RemoteProductInterface[] $product */
         $products = $adapter->fetchProducts();
 
-        /** @var RemoteTaxonomyInterface[] $taxonomy */
+        /** @var RemoteTaxonomyInterface[] $taxonomies */
         $taxonomies = $adapter->fetchTaxonomies();
+
+        /** @var RemoteTaxonomyInterface $taxonomy */
+        $taxonomy = $adapter->fetchTaxonomy(123);
+
+        /** @var RemoteStockInterface[] $stocks */
+        $stocks = $adapter->fetchStocks();
 
         ...
 
