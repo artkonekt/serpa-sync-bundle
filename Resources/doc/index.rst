@@ -1,49 +1,70 @@
 Konekt Serpa Sync Bundle
 ========================
 
+`sERPa`_ ERP has the ability to export product, taxonomy, prices and stock related information and to make them available
+for other systems, typically web shops. Exporting a set of files is done by a web shop module that is configured inside
+`sERPa`_. There are different type of web shop `modules`_, each one exporting files in specific format and structure,
+suitable for different web shops.
+
+This bundle makes possible parsing files exported by `sERPa`_'s different web shop `modules`_ and building up a standardized
+set of models as defined in `Sylius Sync Bundle`_.
+
 Usage In Client Code
 --------------------
 
-A new instance of Model\Adapter class must be created than the fetchProducts() method can be called to return a
-list of product model classes defined in `Sylius Sync Bundle`_ out of .txt files exported by `sERPa`_.
+Each `module`_'s implementation exposes an adapter class that makes the translation. Currently only the `WebshopExperts`_
+module is implemented.
 
-The Sylius Sync Bundle defines factory services that can be used to create the required model instances. Using them
-from inside a controller is straightforward as shown below. The last 5 parameters represents the .txt files exported by
-the `WebshopExperts`_' module configured in `sERPa`_.
+The client code must instantiate the appropriate module's implementation and fetch products, taxonomies and stocks.
+
+Using the `WebshopExperts`_'s implementation should be made as follows:
 
 .. code-block:: php
+
+    use Konekt\SerpaSyncBundle\Model\Adapter\WebshopExpertsAdapter;
+    use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
+    use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
+
+    ...
 
     class YourController extends OtherController
     {
 
-        public function mainAction()
+        public function yourAction()
         {
-            /** @var Konekt\SerpaSyncBundle\Model\Adapter $serpaAdapter */
-            $serpaAdapter = new Konekt\SerpaSyncBundle\Model\Adapter(
+
+            // The order of sERPa files does not matter but all of them should be specified
+
+            $adapter = WebshopExpertsAdapter::create(
                 $this->get('konekt_sylius_sync.remote_product.factory'),
                 $this->get('konekt_sylius_sync.remote_image.factory'),
                 $this->get('konekt_sylius_sync.remote_taxonomy.factory'),
                 $this->get('konekt_sylius_sync.remote_taxon.factory'),
-                '/location/Termek.txt',
-                '/location/TermekAR.txt',
-                '/location/TermekFa.txt',
-                '/location/TermekKategoria.txt',
-                '/location/TermekKeszlet.txt'
+                [
+                    '/path/to/serpa/webshop_experts_data/Termek.txt',
+                    '/path/to/serpa/webshop_experts_data/TermekAR.txt',
+                    '/path/to/serpa/webshop_experts_data/TermekFa.txt',
+                    '/path/to/serpa/webshop_experts_data/TermekKategoria.txt',
+                    '/path/to/serpa/webshop_experts_data/TermekKeszlet.txt'
+                ]
             );
 
-            /** @var Konekt\SyliusSyncBundle\Model\Remote\Product\Product[] $products */
-            $products = $serpaAdapter->fetchProducts();
+        /** @var RemoteProductInterface[] $product */
+        $products = $adapter->fetchProducts();
 
-            /** @var Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxonomy[] $taxonomies */
-            $taxonomies = $serpaAdapter->fetchTaxonomies();
+        /** @var RemoteTaxonomyInterface[] $taxonomy */
+        $taxonomies = $adapter->fetchTaxonomies();
 
-            return $this->render('your_template.html.twig');
+        ...
+
         }
 
     }
 
-Adapter methods related to taxonomies and stocks still to be implemented.
+Adapter methods related to stocks still have to be implemented.
 
-.. _Sylius Sync Bundle: https://github.com/artkonekt/sylius-sync-bundle
-.. _WebshopExperts: http://www.progen.hu/serpa/help/wk_webxhopexpertsinformacio.htm
 .. _sERPa: https://www.progen.hu
+.. _Sylius Sync Bundle: https://github.com/artkonekt/sylius-sync-bundle
+.. _modules: http://www.progen.hu/serpa/help/wk.htm
+.. _module: http://www.progen.hu/serpa/help/wk.htm
+.. _WebshopExperts: http://www.progen.hu/serpa/help/wk_webxhopexpertsinformacio.htm
