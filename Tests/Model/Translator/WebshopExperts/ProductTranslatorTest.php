@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-01
+ * @version     2016-03-02
  * @since       2016-03-01
  */
 
@@ -18,6 +18,7 @@ use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\ProductTranslator;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\Product;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
+use Konekt\SyliusSyncBundle\Model\Remote\Stock\StockFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonFactory;
 
@@ -109,7 +110,8 @@ class ProductTranslatorTest extends \PHPUnit_Framework_TestCase
             new ProductFactory('Konekt\SyliusSyncBundle\Model\Remote\Product\Product'),
             new ImageFactory('Konekt\SyliusSyncBundle\Model\Remote\Image\Image'),
             new TaxonomyFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxonomy'),
-            new TaxonFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxon')
+            new TaxonFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxon'),
+            new StockFactory('Konekt\SyliusSyncBundle\Model\Remote\Stock\Stock')
         );
     }
 

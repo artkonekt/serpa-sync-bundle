@@ -17,6 +17,7 @@ use Konekt\SyliusSyncBundle\Model\Remote\Adapter\RemoteAdapterInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Stock\StockFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
@@ -43,14 +44,15 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      * @param   ImageFactory      $imageFactory      Factory service used to create remote Sylius Sync Bundle images.
      * @param   TaxonomyFactory   $taxonomyFactory   Factory service used to create remote Sylius Sync Bundle taxonomies.
      * @param   TaxonFactory      $taxonFactory      Factory service used to create remote Sylius Sync Bundle taxons.
+     * @param   StockFactory      $stockFactory      Factory service used to create remote Sylius Sync Bundle stocks.
      * @param   array             $inputFiles        The list of files exported by sERPa.
      *
      * @return  static
      *
      * @throws MissingInputFile                      When at least one required input file is missing.
      */
-    public static function create(ProductFactory $productFactory, ImageFactory $imageFactory,
-                                  TaxonomyFactory $taxonomyFactory, TaxonFactory $taxonFactory, array $inputFiles)
+    public static function create(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory,
+                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles)
     {
         $instance = new static();
 
@@ -63,7 +65,7 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
         }
 
         $instance->inputFiles = $inputFiles;
-        $instance->remoteFactories = RemoteFactories::create($productFactory, $imageFactory, $taxonomyFactory, $taxonFactory);
+        $instance->remoteFactories = RemoteFactories::create($productFactory, $imageFactory, $taxonomyFactory, $taxonFactory, $stockFactory);
 
         return $instance;
     }

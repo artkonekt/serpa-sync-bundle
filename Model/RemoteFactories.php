@@ -6,13 +6,14 @@
  * @copyright   Copyright (c) 2016 Storm Storez Srl
  * @license     MIT
  * @since       2016-03-01
- * @version     2016-03-01
+ * @version     2016-03-02
  */
 
 namespace Konekt\SerpaSyncBundle\Model;
 
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
+use Konekt\SyliusSyncBundle\Model\Remote\Stock\StockFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonFactory;
 
@@ -35,6 +36,9 @@ class RemoteFactories
     /** @var  TaxonFactory */
     private $taxonFactory;
 
+    /** @var  StockFactory */
+    private $stockFactory;
+
     /**
      * Creates a new instance of the class.
      *
@@ -42,10 +46,12 @@ class RemoteFactories
      * @param   ImageFactory      $imageFactory      Factory service used to create images required by the sync bundle.
      * @param   TaxonomyFactory   $taxonomyFactory   Factory service used to create taxonomies required by the sync bundle.
      * @param   TaxonFactory      $taxonFactory      Factory service used to create taxons required by the sync bundle.
+     * @param   StockFactory      $stockFactory      Factory service used to create stocks required by the sync bundle.
      *
      * @return  static
      */
-    public static function create(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory, TaxonFactory $taxonFactory)
+    public static function create(ProductFactory $productFactory, ImageFactory $imageFactory,
+                                  TaxonomyFactory $taxonomyFactory, TaxonFactory $taxonFactory, StockFactory $stockFactory)
     {
         $instance = new static();
 
@@ -53,6 +59,7 @@ class RemoteFactories
         $instance->imageFactory = $imageFactory;
         $instance->taxonomyFactory = $taxonomyFactory;
         $instance->taxonFactory = $taxonFactory;
+        $instance->stockFactory = $stockFactory;
 
         return $instance;
     }
@@ -87,11 +94,21 @@ class RemoteFactories
     }
 
     /**
-     * Returns the remote product factory service exposed by Sylius Sync Service to be used to create remote product model instances.
+     * Returns the remote product factory service exposed by Sylius Sync Service to be used to create remote taxon model instances.
      *
      * @return TaxonFactory
      */
     public function getTaxonFactory()
+    {
+        return $this->taxonFactory;
+    }
+
+    /**
+     * Returns the remote stock factory service exposed by Sylius Sync Service to be used to create remote stock model instances.
+     *
+     * @return StockFactory
+     */
+    public function getStockFactory()
     {
         return $this->taxonFactory;
     }

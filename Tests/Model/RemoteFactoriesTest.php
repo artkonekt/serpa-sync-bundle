@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-01
+ * @version     2016-03-02
  * @since       2016-03-01
  */
 
@@ -14,6 +14,7 @@ namespace Konekt\SerpaSyncBundle\Tests\Model;
 use Konekt\SerpaSyncBundle\Model\RemoteFactories;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
+use Konekt\SyliusSyncBundle\Model\Remote\Stock\StockFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonFactory;
 
@@ -26,7 +27,8 @@ class RemoteFactoriesTest extends \PHPUnit_Framework_TestCase
             new ProductFactory(''),
             new ImageFactory(''),
             new TaxonomyFactory(''),
-            new TaxonFactory('')
+            new TaxonFactory(''),
+            new StockFactory('')
         );
 
         $this->assertInstanceOf('Konekt\SerpaSyncBundle\Model\RemoteFactories', $instance);
@@ -38,7 +40,8 @@ class RemoteFactoriesTest extends \PHPUnit_Framework_TestCase
             new ProductFactory('Konekt\SyliusSyncBundle\Model\Remote\Product\Product'),
             new ImageFactory('Konekt\SyliusSyncBundle\Model\Remote\Image\Image'),
             new TaxonomyFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxonomy'),
-            new TaxonFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxon')
+            new TaxonFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxon'),
+            new StockFactory('Konekt\SyliusSyncBundle\Model\Remote\Stock\Stock')
         );
 
         $this->assertInstanceOf('Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory', $instance->getProductFactory());

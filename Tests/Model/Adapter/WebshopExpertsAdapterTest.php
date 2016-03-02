@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-01
+ * @version     2016-03-02
  * @since       2016-03-01
  */
 
@@ -14,6 +14,7 @@ namespace Konekt\SerpaSyncBundle\Tests\Model\Adapter;
 use Konekt\SerpaSyncBundle\Model\Adapter\WebshopExpertsAdapter;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
+use Konekt\SyliusSyncBundle\Model\Remote\Stock\StockFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
 
@@ -36,6 +37,7 @@ class WebshopExpertsAdapterTest extends \PHPUnit_Framework_TestCase
             new ImageFactory('Konekt\SyliusSyncBundle\Model\Remote\Image\Image'),
             new TaxonomyFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxonomy'),
             new TaxonFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxon'),
+            new StockFactory('Konekt\SyliusSyncBundle\Model\Remote\Stock\Stock'),
             [
                 __DIR__ . DIRECTORY_SEPARATOR . '../../Fixtures/Parser/WebshopExperts/TermeK.txt',   // this one should have lowercase "k"
                 __DIR__ . DIRECTORY_SEPARATOR . '../../Fixtures/Parser/WebshopExperts/TermekAR.txt',
@@ -120,6 +122,7 @@ class WebshopExpertsAdapterTest extends \PHPUnit_Framework_TestCase
             new ImageFactory('Konekt\SyliusSyncBundle\Model\Remote\Image\Image'),
             new TaxonomyFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxonomy'),
             new TaxonFactory('Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\Taxon'),
+            new StockFactory('Konekt\SyliusSyncBundle\Model\Remote\Stock\Stock'),
             [
                 __DIR__ . DIRECTORY_SEPARATOR . '../../Fixtures/Parser/WebshopExperts/Termek.txt',
                 __DIR__ . DIRECTORY_SEPARATOR . '../../Fixtures/Parser/WebshopExperts/TermekAR.txt',
