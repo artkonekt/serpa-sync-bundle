@@ -1,9 +1,9 @@
 <?php
 /**
- * Contains class InputFiles.
+ * Contains the InputFiles class.
  *
- * @copyright   Copyright (c) 2016 Storm Storez Srl
  * @author      Sandor Teglas
+ * @copyright   Copyright (c) 2016 Storm Storez Srl
  * @license     MIT
  * @since       2016-02-29
  * @version     2016-03-01

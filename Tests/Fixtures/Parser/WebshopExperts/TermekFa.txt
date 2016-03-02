@@ -1,0 +1,16 @@
+SzuloID	ID	LevelNev	LevelLeiras	
+0	234	Regiok	Ezek a regiok...
+0	235	Whiskey		
+234	194	Skocia		
+194	299	Islay		
+194	209	Felfold		
+209	288	Nyugat Felfold		
+209	289	Észak Felfold		
+209	290	Közép Felfold		
+209	291	Kelet Felfold		
+194	212	Melyfold		
+234	195	Kanada		
+195	302	Quebec		
+195	303	Ontario		
+235	236	Blended		
+235	237	Bourbon		

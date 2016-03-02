@@ -1,17 +1,17 @@
 <?php
 /**
- * Contains class DataSource.
+ * Contains the TxtDataSource class.
  *
- * @copyright   Copyright (c) 2016 Storm Storez Srl
  * @author      Sandor Teglas
- * @license     MIT
- * @since       2016-02-29
- * @version     2016-02-29
+ * @copyright   Copyright (c) 2016 Storm Storez Srl-d
+ * @license     Proprietary
+ * @version     2016-03-01
+ * @since       2016-03-01
  */
 
-namespace Konekt\SerpaSyncBundle\Model;
+namespace Konekt\SerpaSyncBundle\Model\DataSource;
 
-use Exception;
+use Konekt\SerpaSyncBundle\Model\AbstractDataSource;
 
 /**
  * Represents a text file created by sERPa containing various data exported by the WebshopExperts module configured inside sERPa.
@@ -21,13 +21,8 @@ use Exception;
  * The last line is always a Ctrl-Z (ASCII 26) character that is ignored.
  *
  */
-class DataSource
+class TxtDataSource extends AbstractDataSource
 {
-
-    /**
-     * @var string The file containing sERPa data.
-     */
-    protected $file;
 
     /**
      * @var resource The handle of the open file.
@@ -44,59 +39,26 @@ class DataSource
      */
     private $rowsCount = 0;
 
-    private function __construct() {}
-
     /**
-     * Creates a new instance of the class.
+     * @inheritdoc
      *
-     * @param   string       $file   The file containing the sERPa data.
-     *
-     * @return  static
-     *
-     * @throws                       Exception When the file does not exist.
      */
-    public static function create($file)
-    {
-        if (!is_file($file) || is_dir($file)) {
-            throw new Exception("Data source file '$file' does not exist.");
-        }
-
-        $instance = new static();
-        $instance->file = $file;
-
-        return $instance;
-    }
-
-    /**
-     * Returns an array of rows, each one representing an associative array with values mapped to header columns as array keys.
-     *
-     * @return   array
-     */
-    public function getDataRows()
+    public function getAsArray()
     {
         $this->openFile();
         $this->loadHeader();
 
         $res = [];
         while (($row = $this->getNextLine()) !== null) {
-            $values = $this->splitLine($row);
-            $res[] = $this->mapValues($values);
+            if (0 < strlen(trim($row))) {
+                $values = $this->splitLine($row);
+                $res[] = $this->mapValues($values);
+            }
         }
 
         $this->closeFile();
 
         return $res;
-    }
-
-    /**
-     * Returns the number of data rows read from the data source file.
-     *
-     * @return  int
-     */
-    public function getDataRowsCount()
-    {
-        // Header row is not counted
-        return 0 < $this->rowsCount ? $this->rowsCount - 1 : 0;
     }
 
     /**
@@ -123,7 +85,7 @@ class DataSource
         $res = [];
 
         for ($i = 0; $i < count($this->header); $i++) {
-            $res[$this->header[$i]] = $data[$i];
+            $res[$this->header[$i]] = isset($data[$i]) ? $data[$i] : null;
         }
 
         return $res;
@@ -197,7 +159,7 @@ class DataSource
 
         $this->rowsCount++;
 
-        return $line;
+        return trim($line);  // fgets() gets the line with a newline at the end, trimming it
     }
 
 }

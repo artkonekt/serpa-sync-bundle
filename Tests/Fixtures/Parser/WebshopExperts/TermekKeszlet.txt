@@ -1,0 +1,4 @@
+TermekKod	Keszlet	
+WBL-0004	2	
+WBL-0010	0	
+

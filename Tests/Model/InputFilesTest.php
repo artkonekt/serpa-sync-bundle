@@ -1,14 +1,13 @@
 <?php
 /**
- * InputFilesTest.php
+ * Contains the InputFilesTest class.
  *
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
- * @license     Proprietary
+ * @license     MIT
  * @version     2016-03-01
  * @since       2016-03-01
  */
-
 
 namespace Konekt\SerpaSyncBundle\Tests\Model;
 
@@ -47,7 +46,7 @@ class InputFilesTest extends \PHPUnit_Framework_TestCase
             '/path/to/file3.txt',
         ]);
 
-        $this->assertTrue($instance->fileExists('File2.txt'));
+        $this->assertFalse($instance->fileExists('File2.txt'));
     }
 
     public function testGetFile()
@@ -77,7 +76,7 @@ class InputFilesTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Konekt\SerpaSyncBundle\Model\Exception\InvalidInputFile');
 
         InputFiles::create([
-            '/path/to/'
+            ''
         ]);
 
     }

@@ -1,0 +1,5 @@
+TermekKod	Afakulcs	Ar	AkciosAr	
+WBL-0004	27	4244.1	0	
+WBL-0010	27	4165.4	3165.4	
+
+
