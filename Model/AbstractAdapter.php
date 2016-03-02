@@ -36,6 +36,9 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     /** @var  RemoteFactories */
     private $remoteFactories;
 
+    /** @var  RemoteTaxonomyInterface */
+    private $taxonomies = null;
+
     private function __construct() {}
 
     /**
@@ -162,7 +165,7 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     /**
      * Loads the products from sERPa exported files as Sylius Sync Bundle remote model product instances.
      *
-     * @return RemoteProductInterface
+     * @return RemoteProductInterface[]
      */
     public function fetchProducts()
     {
@@ -172,22 +175,40 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     /**
      * Loads the taxonomies from sERPa exported files as Sylius Sync Bundle remote model taxonomy instances.
      *
-     * @return RemoteTaxonomyInterface
+     * @return RemoteTaxonomyInterface[]
      */
     public function fetchTaxonomies()
     {
-        return $this->translate($this->getTaxonomyParser(), $this->getTaxonomyTranslator());
+        if (null === $this->taxonomies) {
+            $this->taxonomies = $this->translate($this->getTaxonomyParser(), $this->getTaxonomyTranslator());
+        }
+
+        return $this->taxonomies;
     }
 
+    /**
+     * Returns a taxonomy by its ID or null if not found.
+     *
+     * @param    string   $id
+     *
+     * @return   null|RemoteTaxonomyInterface
+     */
     public function fetchTaxonomy($id)
     {
+        /** @var RemoteTaxonomyInterface $taxonomy */
+        foreach ($this->fetchTaxonomies() as $taxonomy) {
+            if ($id == $taxonomy->getId()) {
+                return $taxonomy;
+            }
+        }
 
+        return null;
     }
 
     /**
      * Loads the stocks from sERPa exported files as Sylius Sync Bundle remote model stock instances.
      *
-     * @return RemoteStockInterface
+     * @return RemoteStockInterface[]
      */
     public function fetchStocks()
     {
