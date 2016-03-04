@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     Proprietary
- * @version     2016-03-01
+ * @version     2016-03-04
  * @since       2016-03-01
  */
 
@@ -159,7 +159,23 @@ class TxtDataSource extends AbstractDataSource
 
         $this->rowsCount++;
 
-        return trim($line);  // fgets() gets the line with a newline at the end, trimming it
+        return trim($this->convertEncodingToUtf8($line));  // fgets() gets the line with a newline at the end, trimming it
+    }
+
+    /**
+     * Converts a string to UTF-8 encoding if it is encoded differently.
+     *
+     * @param   string   $str   The string to encode.
+     *
+     * @return  string
+     */
+    private function convertEncodingToUtf8($str)
+    {
+        if ('UTF-8' != mb_detect_encoding($str, 'UTF-8', true)) {
+            return mb_convert_encoding($str, "UTF-8");
+        }
+
+        return $str;
     }
 
 }
