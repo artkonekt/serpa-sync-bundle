@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-02
+ * @version     2016-03-04
  * @since       2016-03-01
  */
 
@@ -35,7 +35,7 @@ class TaxonomyTranslator extends AbstractTranslator
 
         $taxonomy->setId($data['ID']);
         /** @var TaxonomyTranslation $translation */
-        $translation = $taxonomy->getTranslation('hu', true);
+        $translation = $taxonomy->getTranslation($this->locale, true);
         $translation->setName($data['LevelNev']);
 
         $taxons = $this->translateTaxonsRecursively($data['children'], $taxonomy);
@@ -60,7 +60,7 @@ class TaxonomyTranslator extends AbstractTranslator
 
         $taxon->setId($data['ID']);
         /** @var RemoteTaxonTranslationInterface $translation */
-        $translation = $taxon->getTranslation('hu', true);
+        $translation = $taxon->getTranslation($this->locale, true);
         $translation->setName($data['LevelNev']);
 
         return $taxon;

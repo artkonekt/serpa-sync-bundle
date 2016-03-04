@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-01
+ * @version     2016-03-04
  * @since       2016-03-01
  */
 
@@ -21,17 +21,22 @@ abstract class AbstractTranslator
     /** @var RemoteFactories */
     protected $remoteFactories;
 
+    /** @var  string */
+    protected $locale;
+
     /**
      * Creates a new instance of the class.
      *
      * @param   RemoteFactories   $remoteFactories   Factories used to create remote mode instances.
+     * @param   string            $locale            The locale of the translation into which to copy the translations.
      *
      * @return  static
      */
-    public static function create(RemoteFactories $remoteFactories)
+    public static function create(RemoteFactories $remoteFactories, $locale)
     {
         $instance = new static();
         $instance->remoteFactories = $remoteFactories;
+        $instance->locale = $locale;
 
         return $instance;
     }

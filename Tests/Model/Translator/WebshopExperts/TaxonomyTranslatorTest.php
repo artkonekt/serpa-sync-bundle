@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-02
+ * @version     2016-03-04
  * @since       2016-03-01
  */
 
@@ -25,16 +25,18 @@ use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
 class TaxonomyTranslatorTest extends \PHPUnit_Framework_TestCase
 {
 
+    private $locale = 'hu_HU';
+
     public function testCreation()
     {
-        $instance = TaxonomyTranslator::create($this->getRemoteFactories());
+        $instance = TaxonomyTranslator::create($this->getRemoteFactories(), $this->locale);
 
         $this->assertInstanceOf('Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\TaxonomyTranslator', $instance);
     }
 
     public function testTranslation()
     {
-        $translator = TaxonomyTranslator::create($this->getRemoteFactories());
+        $translator = TaxonomyTranslator::create($this->getRemoteFactories(), $this->locale);
         $parser = TaxonomyParser::create($this->getInputFiles());
 
         $data = $parser->getAsArray();
@@ -50,11 +52,11 @@ class TaxonomyTranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($data));
 
         $this->assertEquals($taxonomy0->getId(), '234');
-        $this->assertEquals($taxonomy0->getTranslation('hu')->getName(), 'Regiok');
+        $this->assertEquals($taxonomy0->getTranslation($this->locale)->getName(), 'Regiok');
         $this->assertEquals(2, count($taxonomy0->getTaxons()));
 
         $this->assertEquals($taxonomy1->getId(), '235');
-        $this->assertEquals($taxonomy1->getTranslation('hu')->getName(), 'Whiskey');
+        $this->assertEquals($taxonomy1->getTranslation($this->locale)->getName(), 'Whiskey');
         $this->assertEquals(2, count($taxonomy1->getTaxons()));
 
         $this->assertEquals($taxonomy0->getTaxons()[0]->getId(), '194');

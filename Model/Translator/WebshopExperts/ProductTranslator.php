@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-02
+ * @version     2016-03-04
  * @since       2016-03-01
  */
 
@@ -52,7 +52,7 @@ class ProductTranslator extends AbstractTranslator
     {
         $product->setSku($data['TermekKod']);
         /** @var RemoteProductTranslationInterface $translation */
-        $translation = $product->getTranslation('hu', true);
+        $translation = $product->getTranslation($this->locale, true);
         $translation->setName($data['TermekNev']);
         $translation->setShortDescription($data['RovidLeiras']);
         $translation->setDescription($data['Leiras']);
@@ -95,7 +95,7 @@ class ProductTranslator extends AbstractTranslator
             /** @var RemoteAttributeInterface $attribute */
             $attribute = $product->getAttribute($key, true);  // create on if not exists
             /** @var RemoteAttributeTranslationInterface $translation */
-            $translation = $attribute->getTranslation('hu', true);  // Create and return one if not exist
+            $translation = $attribute->getTranslation($this->locale, true);  // Create and return one if not exist
             $translation->setName($value);
         }
 

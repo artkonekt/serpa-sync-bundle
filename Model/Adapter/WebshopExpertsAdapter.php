@@ -5,7 +5,7 @@
 * @author      Sandor Teglas
 * @copyright   Copyright (c) 2016 Storm Storez Srl-d
 * @license     Proprietary
-* @version     2016-03-02
+* @version     2016-03-04
 * @since       2016-03-02
 */
 
@@ -47,7 +47,7 @@ class WebshopExpertsAdapter extends AbstractAdapter
      */
     public function getProductTranslator()
     {
-        return ProductTranslator::create($this->getRemoteFactories());
+        return ProductTranslator::create($this->getRemoteFactories(), 'hu_HU');
     }
 
     /**
@@ -63,7 +63,7 @@ class WebshopExpertsAdapter extends AbstractAdapter
      */
     public function getTaxonomyTranslator()
     {
-        return TaxonomyTranslator::create($this->getRemoteFactories());
+        return TaxonomyTranslator::create($this->getRemoteFactories(), 'hu_HU');
     }
 
     /**
@@ -79,6 +79,6 @@ class WebshopExpertsAdapter extends AbstractAdapter
      */
     public function getStockTranslator()
     {
-        return StockTranslator::create($this->getRemoteFactories());
+        return StockTranslator::create($this->getRemoteFactories(), 'hu_HU');
     }
 }
