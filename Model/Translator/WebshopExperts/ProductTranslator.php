@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-04
+ * @version     2016-03-07
  * @since       2016-03-01
  */
 
@@ -51,6 +51,14 @@ class ProductTranslator extends AbstractTranslator
     private function translateProperties(RemoteProductInterface $product, array $data)
     {
         $product->setSku($data['TermekKod']);
+        $taxonIds = [];
+        foreach (explode(',', $data['TermekFaID']) as $taxonId) {
+            $trimmed = trim($taxonId);
+            if (0 < strlen($trimmed)) {
+                $taxonIds[] = trim($taxonId);
+            }
+        }
+        $product->setTaxonIds($taxonIds);
         /** @var RemoteProductTranslationInterface $translation */
         $translation = $product->getTranslation($this->locale, true);
         $translation->setName($data['TermekNev']);
