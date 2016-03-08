@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-07
+ * @version     2016-03-08
  * @since       2016-03-01
  */
 
@@ -99,12 +99,12 @@ class ProductTranslator extends AbstractTranslator
      */
     private function translateAttributes(RemoteProductInterface $product, array $data)
     {
-        foreach ($data as $key => $value) {
+        foreach ($data as $attributeName => $attributeValue) {
             /** @var RemoteAttributeInterface $attribute */
-            $attribute = $product->getAttribute($key, true);  // create on if not exists
+            $attribute = $product->getAttribute($attributeName, true);  // create on if not exists
             /** @var RemoteAttributeTranslationInterface $translation */
             $translation = $attribute->getTranslation($this->locale, true);  // Create and return one if not exist
-            $translation->setName($value);
+            $translation->setValue($attributeValue);
         }
 
         return $product;
