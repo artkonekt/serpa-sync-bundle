@@ -171,11 +171,7 @@ class TxtDataSource extends AbstractDataSource
      */
     private function convertEncodingToUtf8($str)
     {
-        if ('UTF-8' != mb_detect_encoding($str, 'UTF-8', true)) {
-            return mb_convert_encoding($str, "UTF-8");
-        }
-
-        return $str;
+        return mb_convert_encoding($str, 'UTF-8', 'ASCII');
     }
 
 }
