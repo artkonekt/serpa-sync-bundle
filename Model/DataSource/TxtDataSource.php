@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     Proprietary
- * @version     2016-03-04
+ * @version     2016-03-30
  * @since       2016-03-01
  */
 
@@ -159,7 +159,9 @@ class TxtDataSource extends AbstractDataSource
 
         $this->rowsCount++;
 
-        return trim($this->convertEncodingToUtf8($line));  // fgets() gets the line with a newline at the end, trimming it
+        $utf8String = $this->convertEncodingToUtf8($line);
+
+        return trim($this->fixHungarianAccents($utf8String));  // fgets() gets the line with a newline at the end, trimming it
     }
 
     /**
@@ -172,6 +174,18 @@ class TxtDataSource extends AbstractDataSource
     private function convertEncodingToUtf8($str)
     {
         return mb_convert_encoding($str, 'UTF-8', 'ASCII');
+    }
+
+    /**
+     * Fixes incorrect hungarian accented characters (õ => ő, û => ű, Õ => Ő, Û => Ű).
+     *
+     * @param   string   $str   The string to encode.
+     *
+     * @return  string
+     */
+    private function fixHungarianAccents($str)
+    {
+        return strtr($str, ['õ' => 'ő', 'û' => 'ű', 'Õ' => 'Ő', 'Û' => 'Ű']);
     }
 
 }
