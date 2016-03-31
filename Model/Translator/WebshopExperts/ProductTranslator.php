@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-08
+ * @version     2016-03-31
  * @since       2016-03-01
  */
 
@@ -78,15 +78,28 @@ class ProductTranslator extends AbstractTranslator
      */
     private function translatePriceInfo(RemoteProductInterface $product, array $data)
     {
-        if ('0' == $data['AkciosAr']) {
-            $product->setPrice($data['Ar']);
-            $product->setCatalogPrice($data['Ar']);
-        } else {
-            $product->setPrice($data['AkciosAr']);
-            $product->setCatalogPrice($data['Ar']);
-        }
+        $vatPercent = $data['Afakulcs'];
+
+        $catalogPrice = $data['Ar'];
+        $price = ('0' == $data['AkciosAr'] ? $data['Ar'] : $data['AkciosAr']);
+
+        $product->setPrice($this->applyVatPercent($price, $vatPercent));
+        $product->setCatalogPrice($this->applyVatPercent($catalogPrice, $vatPercent));
 
         return $product;
+    }
+
+    /**
+     * Applies a VAT percent to a price.
+     *
+     * @param   $price        The price for which to apply the VAT percent.
+     * @param   $vatPercent   The percent to apply
+     *
+     * @return  float         The new price, having the VAT percent applied.
+     */
+    private function applyVatPercent($price, $vatPercent)
+    {
+        return $price + ($price * $vatPercent / 100);
     }
 
     /**
