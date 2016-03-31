@@ -11,6 +11,7 @@
 
 namespace Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts;
 
+use AppBundle\Model\Serpa\Import\ImportException;
 use Konekt\SerpaSyncBundle\Model\AbstractTranslator;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
 
@@ -75,18 +76,46 @@ class ProductTranslator extends AbstractTranslator
      * @param   array                    $data
      *
      * @return  RemoteProductInterface
+     *
+     * @throws  ImportException          When the price or catalog price would result in zero after adding VAT and rounding.
      */
     private function translatePriceInfo(RemoteProductInterface $product, array $data)
     {
         $vatPercent = $data['Afakulcs'];
 
-        $catalogPrice = $data['Ar'];
         $price = ('0' == $data['AkciosAr'] ? $data['Ar'] : $data['AkciosAr']);
+        $catalogPrice = $data['Ar'];
 
-        $product->setPrice($this->applyVatPercent($price, $vatPercent));
-        $product->setCatalogPrice($this->applyVatPercent($catalogPrice, $vatPercent));
+        $priceWithVat = $this->applyVatPercent($price, $vatPercent);
+        $catalogPriceWithVat = $this->applyVatPercent($catalogPrice, $vatPercent);
+
+        $roundedPrice = $this->roundPrice($priceWithVat);
+        $roundedCatalogPrice = $this->roundPrice($catalogPriceWithVat);
+
+        if (0 >= $roundedPrice) {
+            throw new ImportException("Rounding the price {$price} plus VAT of {$vatPercent}% for product {$product->getSku()} would result in zero price.");
+        }
+        if (0 >= $roundedCatalogPrice) {
+            throw new ImportException("Rounding the catalog price {$catalogPrice} plus VAT of {$vatPercent}% for product {$product->getSku()} would result in zero price.");
+        }
+
+        $product->setPrice($roundedPrice);
+        $product->setCatalogPrice($roundedCatalogPrice);
 
         return $product;
+    }
+
+    /**
+     * Rounds a price up or down to -1 decimals i.e it will be a multiply of 10.
+     *
+     * @param   $price
+     *
+     * @return  int
+     */
+    private function roundPrice($price)
+    {
+        // Rounding to -1 decimals rounds the last digit of the integer part to the nearest 10th
+        return round($price, -1);
     }
 
     /**
