@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-31
+ * @version     2016-04-01
  * @since       2016-03-01
  */
 
@@ -77,11 +77,16 @@ class ProductTranslator extends AbstractTranslator
      *
      * @return  RemoteProductInterface
      *
+     * @throws  ImportException          If an invalid VAT percent is encountered.
      * @throws  ImportException          When the price or catalog price would result in zero after adding VAT and rounding.
      */
     private function translatePriceInfo(RemoteProductInterface $product, array $data)
     {
         $vatPercent = $data['Afakulcs'];
+
+        if (0 > $vatPercent) {
+            throw new ImportException("Invalid VAT percent detected for product {$product->getSku()}: {$vatPercent}.");
+        }
 
         $price = ('0' == $data['AkciosAr'] ? $data['Ar'] : $data['AkciosAr']);
         $catalogPrice = $data['Ar'];
@@ -101,6 +106,7 @@ class ProductTranslator extends AbstractTranslator
 
         $product->setPrice($roundedPrice);
         $product->setCatalogPrice($roundedCatalogPrice);
+        $product->setVatPercent($vatPercent);
 
         return $product;
     }
