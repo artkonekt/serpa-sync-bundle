@@ -3,9 +3,10 @@
  * Contains the ProductParser class.
  *
  * @author      Sandor Teglas
+ * @author      Hunor Kedves <hunor@artkonekt.com>
  * @copyright   Copyright (c) 2016 Storm Storez Srl
  * @license     MIT
- * @since       2016-03-01
+ * @since       2016-04-07
  * @version     2016-03-01
  */
 
@@ -35,13 +36,15 @@ class ProductParser extends AbstractParser
         $products = TxtDataSource::create($this->inputFiles->getFile('Termek.txt'))->getAsArray();
         $prices = TxtDataSource::create($this->inputFiles->getFile('TermekAR.txt'))->getAsArray();
         $attributes = TxtDataSource::create($this->inputFiles->getFile('TermekKategoria.txt'))->getAsArray();
+        $images = TxtDataSource::create($this->inputFiles->getFile('Kepek.txt'))->getAsArray();
 
         $res = [];
         foreach ($products as $product) {
             $sku = $product['TermekKod'];
             $priceInfo = $this->lookupPriceBySku($sku, $prices);
             $attributeInfo = $this->lookupAttributesBySku($sku, $attributes);
-            $res[] = ['product' => $product, 'price' => $priceInfo, 'attributes' => $attributeInfo];
+            $imageInfo = $this->lookupImagesBySku($sku, $images);
+            $res[] = ['product' => $product, 'price' => $priceInfo, 'attributes' => $attributeInfo, 'images' => $imageInfo];
         }
 
         return $res;
@@ -87,4 +90,22 @@ class ProductParser extends AbstractParser
         return null;
     }
 
+    /**
+     * Looks up the image of a product by its SKU.
+     *
+     * @param   string       $sku
+     * @param   array        $images   The images array to search in.
+     *
+     * @return  null|array
+     */
+    private function lookupImagesBySku($sku, array $images)
+    {
+        foreach($images as $image) {
+            if ($sku == $image['TermekKod']) {
+                return $image;
+            }
+        }
+
+        return null;
+    }
 }

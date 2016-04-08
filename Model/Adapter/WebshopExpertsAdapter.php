@@ -3,9 +3,10 @@
 * Contains the WebshopExpertsAdapter class.
 *
 * @author      Sandor Teglas
+* @author      Hunor Kedves <hunor@artkonekt.com>
 * @copyright   Copyright (c) 2016 Storm Storez Srl-d
 * @license     Proprietary
-* @version     2016-03-04
+* @version     2016-04-07
 * @since       2016-03-02
 */
 
@@ -15,6 +16,7 @@ use Konekt\SerpaSyncBundle\Model\AbstractAdapter;
 use Konekt\SerpaSyncBundle\Model\Parser\WebshopExperts\ProductParser;
 use Konekt\SerpaSyncBundle\Model\Parser\WebshopExperts\StockParser;
 use Konekt\SerpaSyncBundle\Model\Parser\WebshopExperts\TaxonomyParser;
+use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\ImageTranslator;
 use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\ProductTranslator;
 use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\StockTranslator;
 use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\TaxonomyTranslator;
@@ -31,7 +33,7 @@ class WebshopExpertsAdapter extends AbstractAdapter
      */
     public function getRequiredFiles()
     {
-        return ['Termek.txt', 'TermekAR.txt', 'TermekFa.txt', 'TermekKategoria.txt', 'TermekKeszlet.txt'];
+        return ['Termek.txt', 'TermekAR.txt', 'TermekFa.txt', 'TermekKategoria.txt', 'TermekKeszlet.txt', 'Kepek.txt'];
     }
 
     /**

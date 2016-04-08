@@ -3,9 +3,10 @@
  * Contains the ProductTranslator class.
  *
  * @author      Sandor Teglas
+ * @author      Hunor Kedves <hunor@artkonekt.com>
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-04-01
+ * @version     2016-04-07
  * @since       2016-03-01
  */
 
@@ -13,6 +14,7 @@ namespace Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts;
 
 use AppBundle\Model\Serpa\Import\ImportException;
 use Konekt\SerpaSyncBundle\Model\AbstractTranslator;
+use Konekt\SyliusSyncBundle\Model\Remote\Image\RemoteImageInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
 
 class ProductTranslator extends AbstractTranslator
@@ -36,6 +38,10 @@ class ProductTranslator extends AbstractTranslator
         }
         if ($data['attributes']) {
             $this->translateAttributes($product, $data['attributes']);
+        }
+
+        if ($data['images']) {
+            $this->translateImages($product, $data['images']);
         }
 
         return $product;
@@ -158,4 +164,22 @@ class ProductTranslator extends AbstractTranslator
         return $product;
     }
 
+    /**
+     * Translate product images.
+     *
+     * @param RemoteProductInterface $product
+     * @param array                  $data
+     *
+     * @return RemoteProductInterface
+     */
+    private function translateImages(RemoteProductInterface $product, array $data)
+    {
+        foreach (explode(',', $data['Kepek']) as $image) {
+            /** @var RemoteImageInterface $remoteImage */
+            $remoteImage = $this->remoteFactories->getImageFactoryFactory()->createFromUrl($image);
+            $product->addImage($remoteImage);
+        }
+
+        return $product;
+    }
 }
