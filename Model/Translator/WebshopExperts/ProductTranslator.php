@@ -6,7 +6,7 @@
  * @author      Hunor Kedves <hunor@artkonekt.com>
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-04-07
+ * @version     2016-04-08
  * @since       2016-03-01
  */
 
@@ -14,11 +14,36 @@ namespace Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts;
 
 use AppBundle\Model\Serpa\Import\ImportException;
 use Konekt\SerpaSyncBundle\Model\AbstractTranslator;
+use Konekt\SerpaSyncBundle\Model\Exception\FileNotFoundException;
+use Konekt\SerpaSyncBundle\Model\Exception\InvalidImagesFolder;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\RemoteImageInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
 
 class ProductTranslator extends AbstractTranslator
 {
+
+    /** @var  string */
+    private $imagesFolder;
+
+    /**
+     * Sets the folder where product images are located.
+     *
+     * @param   string   $imagesFolder
+     */
+    public function setImagesFolder($imagesFolder)
+    {
+        $this->imagesFolder = $imagesFolder;
+    }
+
+    /**
+     * Returns the folder where product images are located.
+     *
+     * @return string
+     */
+    public function getImagesFolder()
+    {
+        return $this->imagesFolder;
+    }
 
     /**
      * Translates array data to a remote product instance.
@@ -33,15 +58,12 @@ class ProductTranslator extends AbstractTranslator
         $product = $this->remoteFactories->getProductFactory()->create();
 
         $this->translateProperties($product, $data['product']);
+        $this->translateImages($product, $data['product']);
         if ($data['price']) {
             $this->translatePriceInfo($product, $data['price']);
         }
         if ($data['attributes']) {
             $this->translateAttributes($product, $data['attributes']);
-        }
-
-        if ($data['images']) {
-            $this->translateImages($product, $data['images']);
         }
 
         return $product;
@@ -167,16 +189,33 @@ class ProductTranslator extends AbstractTranslator
     /**
      * Translate product images.
      *
-     * @param RemoteProductInterface $product
-     * @param array                  $data
+     * @param   RemoteProductInterface   $product
+     * @param   array                    $data
      *
-     * @return RemoteProductInterface
+     * @return  RemoteProductInterface
+     *
+     * @throws  InvalidImagesFolder      When the images folder containing images exported by Serpa was not set.
+     * @throws  FileNotFoundException    When an image file specified by Serpa is not found.
      */
     private function translateImages(RemoteProductInterface $product, array $data)
     {
-        foreach (explode(',', $data['Kepek']) as $image) {
+        $imagesFolder = $this->getImagesFolder();
+        if (empty($imagesFolder)) {
+            throw new InvalidImagesFolder('The product images folder must be set before translating Serpa products to remote product instances.');
+        }
+
+        // Parsing images exported by Serpa
+        $images = explode(',', $data['Kepnev']);
+        foreach ($images as $image) {
+            if (empty($image)) {
+                continue;
+            }
             /** @var RemoteImageInterface $remoteImage */
-            $remoteImage = $this->remoteFactories->getImageFactoryFactory()->createFromUrl($image);
+            $imagePath = $imagesFolder . '/' . $image;
+            if (!file_exists($imagePath) || is_dir($imagePath)) {
+                throw new FileNotFoundException("The image file '$imagePath' of product having SKU '{$product->getSku()}' was not found.");
+            }
+            $remoteImage = $this->remoteFactories->getImageFactory()->createFromFile($imagesFolder . '/' . $image);
             $product->addImage($remoteImage);
         }
 

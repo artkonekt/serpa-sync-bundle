@@ -6,7 +6,7 @@
 * @author      Hunor Kedves <hunor@artkonekt.com>
 * @copyright   Copyright (c) 2016 Storm Storez Srl-d
 * @license     Proprietary
-* @version     2016-04-07
+* @version     2016-04-08
 * @since       2016-03-02
 */
 
@@ -33,7 +33,7 @@ class WebshopExpertsAdapter extends AbstractAdapter
      */
     public function getRequiredFiles()
     {
-        return ['Termek.txt', 'TermekAR.txt', 'TermekFa.txt', 'TermekKategoria.txt', 'TermekKeszlet.txt', 'Kepek.txt'];
+        return ['Termek.txt', 'TermekAR.txt', 'TermekFa.txt', 'TermekKategoria.txt', 'TermekKeszlet.txt'];
     }
 
     /**

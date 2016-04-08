@@ -5,13 +5,15 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-02
+ * @version     2016-04-08
  * @since       2016-03-02
  */
 
 namespace Konekt\SerpaSyncBundle\Model;
 
+use Konekt\SerpaSyncBundle\Model\Exception\InvalidImagesFolder;
 use Konekt\SerpaSyncBundle\Model\Exception\MissingInputFile;
+use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\ProductTranslator;
 use Konekt\SyliusSyncBundle\Model\Remote\Adapter\Konekt;
 use Konekt\SyliusSyncBundle\Model\Remote\Adapter\RemoteAdapterInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
@@ -33,6 +35,9 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     /** @var  InputFiles */
     private $inputFiles;
 
+    /** @var  string */
+    private $imagesFolder;
+
     /** @var  RemoteFactories */
     private $remoteFactories;
 
@@ -50,13 +55,15 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      * @param   TaxonFactory      $taxonFactory      Factory service used to create remote Sylius Sync Bundle taxons.
      * @param   StockFactory      $stockFactory      Factory service used to create remote Sylius Sync Bundle stocks.
      * @param   array             $inputFiles        The list of files exported by sERPa.
+     * @param   string            $imagesFolder      The folder containing product images to import.
      *
      * @return  static
      *
      * @throws MissingInputFile                      When at least one required input file is missing.
+     * @throws InvalidImagesFolder                   When the folder containing the product images either does not exist or it is not a folder.
      */
     public static function create(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory,
-                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles)
+                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles, $imagesFolder)
     {
         $instance = new static();
 
@@ -64,11 +71,18 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
         $inputFiles = InputFiles::create($inputFiles);
         foreach ($instance->getRequiredFiles() as $file) {
             if (!$inputFiles->fileExists($file)) {
-                throw new MissingInputFile("Input file '$file'' is required but it is missing.");
+                throw new MissingInputFile("Input file '$file' is required but it is missing.");
             }
         }
 
         $instance->inputFiles = $inputFiles;
+
+        if (!file_exists($imagesFolder) || !is_dir($imagesFolder)) {
+            throw new InvalidImagesFolder("The images folder '$imagesFolder' either does not exist or it is not a folder.");
+        }
+
+        $instance->imagesFolder = $imagesFolder;
+
         $instance->remoteFactories = RemoteFactories::create($productFactory, $imageFactory, $taxonomyFactory, $taxonFactory, $stockFactory);
 
         return $instance;
@@ -82,6 +96,16 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     public function getInputFiles()
     {
         return $this->inputFiles;
+    }
+
+    /**
+     * Returns the folder containing product images to import.
+     *
+     * @return string
+     */
+    public function getImagesFolder()
+    {
+        return $this->imagesFolder;
     }
 
     /**
@@ -169,7 +193,11 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      */
     public function fetchProducts()
     {
-        return $this->translate($this->getProductParser(), $this->getProductTranslator());
+        /** @var ProductTranslator $productTranslator */
+        $productTranslator = $this->getProductTranslator();
+        $productTranslator->setImagesFolder($this->getImagesFolder());
+
+        return $this->translate($this->getProductParser(), $productTranslator);
     }
 
     /**
