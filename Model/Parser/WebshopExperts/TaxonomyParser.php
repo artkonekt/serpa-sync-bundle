@@ -6,7 +6,7 @@
  * @copyright   Copyright (c) 2016 Storm Storez Srl
  * @license     MIT
  * @since       2016-03-01
- * @version     2016-03-01
+ * @version     2016-04-29
  */
 
 namespace Konekt\SerpaSyncBundle\Model\Parser\WebshopExperts;
@@ -29,7 +29,14 @@ class TaxonomyParser extends AbstractParser
     {
         $taxonomies = TxtDataSource::create($this->inputFiles->getFile('TermekFa.txt'))->getAsArray();
 
-        return $this->getTaxonChildrenByParentId(0, $taxonomies);
+        if (0 == count($taxonomies)) {
+            return [];
+        }
+
+        // The first row is the root of all taxonomies
+        $rootId = $taxonomies[0]['ID'];
+
+        return $this->getTaxonChildrenByParentId($rootId, $taxonomies);
     }
 
     private function getTaxonChildrenByParentId($parentId, array $rawTaxonomies)
