@@ -5,7 +5,7 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-04-08
+ * @version     2016-05-03
  * @since       2016-03-02
  */
 
@@ -13,7 +13,9 @@ namespace Konekt\SerpaSyncBundle\Model;
 
 use Konekt\SerpaSyncBundle\Model\Exception\InvalidImagesFolder;
 use Konekt\SerpaSyncBundle\Model\Exception\MissingInputFile;
-use Konekt\SerpaSyncBundle\Model\Translator\WebshopExperts\ProductTranslator;
+use Konekt\SerpaSyncBundle\Model\Module\WebshopExpertsXml\ProductTranslator;
+use Konekt\SerpaSyncBundle\Model\Module\WebshopExpertsXml\StockTranslator;
+use Konekt\SerpaSyncBundle\Model\Module\WebshopExpertsXml\TaxonomyTranslator;
 use Konekt\SyliusSyncBundle\Model\Remote\Adapter\Konekt;
 use Konekt\SyliusSyncBundle\Model\Remote\Adapter\RemoteAdapterInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
@@ -32,18 +34,24 @@ use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\TaxonomyFactory;
 abstract class AbstractAdapter implements RemoteAdapterInterface
 {
 
+    /** @var  RemoteFactories */
+    private $remoteFactories;
+
     /** @var  InputFiles */
     private $inputFiles;
 
     /** @var  string */
     private $imagesFolder;
 
-    /** @var  RemoteFactories */
-    private $remoteFactories;
+    /** @var  string */
+    private $locale;
 
-    /** @var  RemoteTaxonomyInterface */
-    private $taxonomies = null;
+    /** @var  Parser */
+    private $parser;
 
+    /** @var array */
+    private $cache = [];
+    
     private function __construct() {}
 
     /**
@@ -56,6 +64,7 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      * @param   StockFactory      $stockFactory      Factory service used to create remote Sylius Sync Bundle stocks.
      * @param   array             $inputFiles        The list of files exported by sERPa.
      * @param   string            $imagesFolder      The folder containing product images to import.
+     * @param   string            $locale            The locale of the translation into which to copy the translations.
      *
      * @return  static
      *
@@ -63,7 +72,7 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      * @throws InvalidImagesFolder                   When the folder containing the product images either does not exist or it is not a folder.
      */
     public static function create(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory,
-                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles, $imagesFolder)
+                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles, $imagesFolder, $locale)
     {
         $instance = new static();
 
@@ -84,57 +93,9 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
         $instance->imagesFolder = $imagesFolder;
 
         $instance->remoteFactories = RemoteFactories::create($productFactory, $imageFactory, $taxonomyFactory, $taxonFactory, $stockFactory);
+        $instance->locale = $locale;
 
         return $instance;
-    }
-
-    /**
-     * Returns the list of files exported by sERPa.
-     *
-     * @return InputFiles
-     */
-    public function getInputFiles()
-    {
-        return $this->inputFiles;
-    }
-
-    /**
-     * Returns the folder containing product images to import.
-     *
-     * @return string
-     */
-    public function getImagesFolder()
-    {
-        return $this->imagesFolder;
-    }
-
-    /**
-     * Returns the remote factories to be used to create Sylius Sync Bundle model instances.
-     *
-     * @return RemoteFactories
-     */
-    public function getRemoteFactories()
-    {
-        return $this->remoteFactories;
-    }
-
-    /**
-     * Loads, parses and translate a list of items (products, taxonomies or stocks) from files exported by sERPa
-     * and build up a list of Sylius Sync Bundle remote model instances.
-     *
-     * @param   AbstractParser       $parser       The parser used to load data from sERPa files.
-     * @param   AbstractTranslator   $translator   The translator used to translate sERPa data to Sylius Remote Bundle model instances.
-     *
-     * @return  array
-     */
-    protected function translate(AbstractParser $parser, AbstractTranslator $translator)
-    {
-        $remoteModels = [];
-        foreach ($parser->getAsArray() as $data) {
-            $remoteModels[] = $translator->translate($data);
-        }
-
-        return $remoteModels;
     }
 
     /**
@@ -145,46 +106,11 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     abstract public function getRequiredFiles();
 
     /**
-     * Returns the parser that loads product data from files exported by sERPa.
+     * Returns the class of the parser able to load data from Serpa files.
      *
-     * @return AbstractParser
+     * @return string
      */
-    abstract public function getProductParser();
-
-    /**
-     * Returns the translator that translates product data loaded by the parser into Sylius Sync Bundle remote product instances.
-     *
-     * @return AbstractTranslator
-     */
-    abstract public function getProductTranslator();
-
-    /**
-     * Returns the parser that loads taxonomies data from files exported by sERPa.
-     *
-     * @return AbstractParser
-     */
-    abstract public function getTaxonomyParser();
-
-    /**
-     * Returns the translator that translates taxonomy data loaded by the parser into Sylius Sync Bundle remote taxonomy instances.
-     *
-     * @return AbstractTranslator
-     */
-    abstract public function getTaxonomyTranslator();
-
-    /**
-     * Returns the parser that loads stock data from files exported by sERPa.
-     *
-     * @return AbstractParser
-     */
-    abstract public function getStockParser();
-
-    /**
-     * Returns the translator that translates stock data loaded by the parser into Sylius Sync Bundle remote stock instances.
-     *
-     * @return AbstractTranslator
-     */
-    abstract public function getStockTranslator();
+    abstract public function getParserClass();
 
     /**
      * Loads the products from sERPa exported files as Sylius Sync Bundle remote model product instances.
@@ -193,11 +119,13 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      */
     public function fetchProducts()
     {
-        /** @var ProductTranslator $productTranslator */
-        $productTranslator = $this->getProductTranslator();
-        $productTranslator->setImagesFolder($this->getImagesFolder());
+        if (!array_key_exists('products', $this->cache)) {
+            $translator = $this->createTranslatorInstance(ProductTranslator::class);
+            $res = $translator->translate();
+            $this->cache['products'] = $res;
+        }
 
-        return $this->translate($this->getProductParser(), $productTranslator);
+        return $this->cache['products'];
     }
 
     /**
@@ -207,11 +135,13 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      */
     public function fetchTaxonomies()
     {
-        if (null === $this->taxonomies) {
-            $this->taxonomies = $this->translate($this->getTaxonomyParser(), $this->getTaxonomyTranslator());
+        if (!array_key_exists('taxonomies', $this->cache)) {
+            $translator = $this->createTranslatorInstance(TaxonomyTranslator::class);
+            $res = $translator->translate();
+            $this->cache['taxonomies'] = $res;
         }
 
-        return $this->taxonomies;
+        return $this->cache['taxonomies'];
     }
 
     /**
@@ -240,7 +170,32 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      */
     public function fetchStocks()
     {
-        return $this->translate($this->getStockParser(), $this->getStockTranslator());
+        if (!array_key_exists('stocks', $this->cache)) {
+            $translator = $this->createTranslatorInstance(StockTranslator::class);
+            $res = $translator->translate();
+            $this->cache['stocks'] = $res;
+        }
+
+        return $this->cache['stocks'];
+    }
+
+    /**
+     * Creates a translator able to ranslate products, stocks or taxonomies from files exported by Serpa to remote instances.
+     *
+     * @return   AbstractTranslator
+     */
+    private function createTranslatorInstance($class)
+    {
+        if (!$this->parser) {
+            $parserClass = $this->getParserClass();
+            $this->parser = $parserClass::create($this->inputFiles);
+        }
+
+        return $class::create(
+            $this->remoteFactories,
+            $this->parser,
+            $this->imagesFolder,
+            $this->locale);
     }
 
 }
