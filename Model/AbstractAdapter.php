@@ -46,6 +46,12 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     /** @var  string */
     private $locale;
 
+    /** @var  string */
+    private $internetPriceKey;
+
+    /** @var  string */
+    private $storePriceKey;
+
     /** @var  Parser */
     private $parser;
 
@@ -72,7 +78,8 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      * @throws InvalidImagesFolder                   When the folder containing the product images either does not exist or it is not a folder.
      */
     public static function create(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory,
-                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles, $imagesFolder, $locale)
+                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles, $imagesFolder, $locale,
+                                  $internetPriceKey, $storePriceKey)
     {
         $instance = new static();
 
@@ -94,6 +101,9 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
 
         $instance->remoteFactories = RemoteFactories::create($productFactory, $imageFactory, $taxonomyFactory, $taxonFactory, $stockFactory);
         $instance->locale = $locale;
+
+        $instance->internetPriceKey = $internetPriceKey;
+        $instance->storePriceKey = $storePriceKey;
 
         return $instance;
     }
@@ -121,6 +131,8 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
     {
         if (!array_key_exists('products', $this->cache)) {
             $translator = $this->createTranslatorInstance(ProductTranslator::class);
+            $translator->internetPriceKey = $this->internetPriceKey;
+            $translator->storePriceKey = $this->storePriceKey;
             $res = $translator->translate();
             $this->cache['products'] = $res;
         }

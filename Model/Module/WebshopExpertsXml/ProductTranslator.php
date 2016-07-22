@@ -15,9 +15,8 @@ namespace Konekt\SerpaSyncBundle\Model\Module\WebshopExpertsXml;
 use AppBundle\Model\Serpa\Import\ImportException;
 use Konekt\SerpaSyncBundle\Model\AbstractTranslator;
 use Konekt\SerpaSyncBundle\Model\Exception\MultiplePriceException;
-use Konekt\SyliusSyncBundle\Model\Remote\Image\ImageFactory;
+use Konekt\SerpaSyncBundle\Model\Exception\PriceNotFoundException;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\RemoteImageInterface;
-use Konekt\SyliusSyncBundle\Model\Remote\Product\ProductFactory;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteAttributeInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteAttributeTranslationInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
@@ -31,6 +30,12 @@ class ProductTranslator extends AbstractTranslator
 
     /** @var  array */
     private $categories;
+
+    /** @var  string */
+    public $internetPriceKey;
+
+    /** @var  string */
+    public $storePriceKey;
 
     /**
      * Translates product from XML files to remote product instances.
@@ -78,10 +83,7 @@ class ProductTranslator extends AbstractTranslator
      */
     private function assignBasicProperties(RemoteProductInterface $product, $data)
     {
-        $roundedPrice = $this->roundPrice($data);
         $product->setSku($data['sku']);
-        $product->setCatalogPrice($data['catalogPrice']);
-        $product->setVatPercent($data['vatPercent']);
         /** @var RemoteProductTranslationInterface $translation */
         $translation = $product->getTranslation($this->locale, true);
         $translation->setName($data['name']);
@@ -126,8 +128,9 @@ class ProductTranslator extends AbstractTranslator
             throw new ImportException("Invalid VAT percent detected for product {$data['sku']}: {$vatPercent}.");
         }
 
-        $price = $data['price'];
-        $catalogPrice = $data['catalogPrice'];
+        $price = $data['internetPrice'];
+        $catalogPrice = $data['storePrice'];
+        // $data['promoPrice'] is also there from SpecialPrice.xml, it might be used if required
 
         $priceWithVat = $this->applyVatPercent($price, $vatPercent);
         $catalogPriceWithVat = $this->applyVatPercent($catalogPrice, $vatPercent);
@@ -136,10 +139,10 @@ class ProductTranslator extends AbstractTranslator
         $roundedCatalogPrice = $this->roundPrice($catalogPriceWithVat);
 
         if (0 >= $roundedPrice) {
-            throw new ImportException("Rounding the price {$price} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
+            throw new ImportException("Rounding the internet price {$price} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
         }
         if (0 >= $roundedCatalogPrice) {
-            throw new ImportException("Rounding the catalog price {$catalogPrice} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
+            throw new ImportException("Rounding the store price {$catalogPrice} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
         }
 
         $product->setPrice($roundedPrice);
@@ -231,6 +234,16 @@ class ProductTranslator extends AbstractTranslator
             $id = $data['@ID'];
             $sku = $data['Code'];
             $specialPrice = $this->collectSpecialPriceOfProduct($id, $specialPrices);
+
+            $internetPrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->internetPriceKey);
+            if (is_null($internetPrice)) {
+                throw new PriceNotFoundException("Price of type `{$this->internetPriceKey}` was not found.");
+            }
+            $storePrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->storePriceKey);
+            if (is_null($storePrice)) {
+                throw new PriceNotFoundException("Price of type `{$this->storePriceKey}` was not found.");
+            }
+
             $res[$sku] = [
                 'id' => $id,
                 'sku' => $sku,
@@ -238,8 +251,9 @@ class ProductTranslator extends AbstractTranslator
                 'shortDescription' => isset($data['ShortDescription']) ? $data['ShortDescription'] : null,
                 'description' => isset($data['Description']) ? $data['Description'] : null,
                 'vatPercent' => $data['VATPercent'],
-                'catalogPrice' => $data['Prices']['Price']['Value'],
-                'price' => $specialPrice ? $specialPrice : $data['Prices']['Price']['Value'],
+                'internetPrice' => $internetPrice,
+                'storePrice' => $storePrice,
+                'promoPrice' => $specialPrice ? $specialPrice : null,
                 'taxonIds' => $this->collectTaxonIdsOfProduct($data),
                 'images' => $this->collectImagesOfProduct($data),
                 'categories' => $this->collectCategoriesOfProduct($data)
@@ -247,6 +261,17 @@ class ProductTranslator extends AbstractTranslator
         }
 
         return $res;
+    }
+
+    private function extractPriceFromPriceList(array $list, $type)
+    {
+        foreach ($list as $priceInfo) {
+            if ($type == $priceInfo['@Type']) {
+                return $priceInfo['Value'];
+            }
+        }
+
+        return null;
     }
 
     /**
