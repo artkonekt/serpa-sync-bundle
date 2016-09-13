@@ -130,13 +130,15 @@ class ProductTranslator extends AbstractTranslator
 
         $price = $data['internetPrice'];
         $catalogPrice = $data['storePrice'];
-        // $data['promoPrice'] is also there from SpecialPrice.xml, it might be used if required
+        $specialPrice = $data['specialPrice'];
 
         $priceWithVat = $this->applyVatPercent($price, $vatPercent);
         $catalogPriceWithVat = $this->applyVatPercent($catalogPrice, $vatPercent);
+        $specialPriceWithVat = $specialPrice ? $this->applyVatPercent($specialPrice, $vatPercent) : null;
 
         $roundedPrice = $this->roundPrice($priceWithVat);
         $roundedCatalogPrice = $this->roundPrice($catalogPriceWithVat);
+        $roundedSpecialPrice = $specialPriceWithVat ? $this->roundPrice($specialPriceWithVat) : null;
 
         if (0 >= $roundedPrice) {
             throw new ImportException("Rounding the internet price {$price} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
@@ -144,9 +146,13 @@ class ProductTranslator extends AbstractTranslator
         if (0 >= $roundedCatalogPrice) {
             throw new ImportException("Rounding the store price {$catalogPrice} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
         }
+        if ($roundedSpecialPrice && 0 >= $roundedSpecialPrice) {
+            throw new ImportException("Rounding the special price {$specialPrice} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
+        }
 
         $product->setPrice($roundedPrice);
         $product->setCatalogPrice($roundedCatalogPrice);
+        $product->setSpecialPrice($roundedSpecialPrice);
         $product->setVatPercent($vatPercent);
 
         return $product;
@@ -253,7 +259,7 @@ class ProductTranslator extends AbstractTranslator
                 'vatPercent' => $data['VATPercent'],
                 'internetPrice' => $internetPrice,
                 'storePrice' => $storePrice,
-                'promoPrice' => $specialPrice ? $specialPrice : null,
+                'specialPrice' => $specialPrice ? $specialPrice : null,
                 'taxonIds' => $this->collectTaxonIdsOfProduct($data),
                 'images' => $this->collectImagesOfProduct($data),
                 'categories' => $this->collectCategoriesOfProduct($data)
