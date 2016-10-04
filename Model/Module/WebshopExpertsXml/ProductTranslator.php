@@ -14,8 +14,6 @@ namespace Konekt\SerpaSyncBundle\Model\Module\WebshopExpertsXml;
 
 use AppBundle\Model\Serpa\Import\ImportException;
 use Konekt\SerpaSyncBundle\Model\AbstractTranslator;
-use Konekt\SerpaSyncBundle\Model\Exception\MultiplePriceException;
-use Konekt\SerpaSyncBundle\Model\Exception\PriceNotFoundException;
 use Konekt\SyliusSyncBundle\Model\Remote\Image\RemoteImageInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteAttributeInterface;
 use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteAttributeTranslationInterface;
@@ -140,16 +138,6 @@ class ProductTranslator extends AbstractTranslator
         $roundedCatalogPrice = $this->roundPrice($catalogPriceWithVat);
         $roundedSpecialPrice = $specialPriceWithVat ? $this->roundPrice($specialPriceWithVat) : null;
 
-        if (0 >= $roundedPrice) {
-            throw new ImportException("Rounding the internet price {$price} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
-        }
-        if (0 >= $roundedCatalogPrice) {
-            throw new ImportException("Rounding the store price {$catalogPrice} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
-        }
-        if ($roundedSpecialPrice && 0 >= $roundedSpecialPrice) {
-            throw new ImportException("Rounding the special price {$specialPrice} plus VAT of {$vatPercent}% for product {$data['sku']} would result in zero price.");
-        }
-
         $product->setPrice($roundedPrice);
         $product->setCatalogPrice($roundedCatalogPrice);
         $product->setSpecialPrice($roundedSpecialPrice);
@@ -238,22 +226,22 @@ class ProductTranslator extends AbstractTranslator
 
         foreach ($this->parser->getProducts() as $data) {
 
-            if (!isset($data['Prices'])) {
-                throw new PriceNotFoundException("No price has been found for product `{$data['Name']}` having SKU `{$data['Code']}``.");
-            }
-
             $id = $data['@ID'];
             $sku = $data['Code'];
+
             $specialPrice = $this->collectSpecialPriceOfProduct($id, $specialPrices);
 
-            $internetPrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->internetPriceKey);
-            if (is_null($internetPrice)) {
-                throw new PriceNotFoundException("Price of type `{$this->internetPriceKey}` was not found for product `{$data['Name']}` having SKU `{$data['Code']}``.");
+            $internetPrice = null;
+            if (isset($data['Prices']['Price'])) {
+                $internetPrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->internetPriceKey);
             }
-            $storePrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->storePriceKey);
-            if (is_null($storePrice)) {
-                throw new PriceNotFoundException("Price of type `{$this->storePriceKey}` was not found for product `{$data['Name']}` having SKU `{$data['Code']}``.");
+            $internetPrice = $internetPrice ? $internetPrice : 0;
+
+            $storePrice = null;
+            if (isset($data['Prices']['Price'])) {
+                $storePrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->storePriceKey);
             }
+            $storePrice = $storePrice ? $storePrice : 0;
 
             $res[$sku] = [
                 'id' => $id,
