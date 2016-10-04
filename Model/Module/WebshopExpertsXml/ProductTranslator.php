@@ -237,17 +237,22 @@ class ProductTranslator extends AbstractTranslator
         $specialPrices = $this->collectSpecialPrices();
 
         foreach ($this->parser->getProducts() as $data) {
+
+            if (!isset($data['Prices'])) {
+                throw new PriceNotFoundException("No price has been found for product `{$data['Name']}` having SKU `{$data['Code']}``.");
+            }
+
             $id = $data['@ID'];
             $sku = $data['Code'];
             $specialPrice = $this->collectSpecialPriceOfProduct($id, $specialPrices);
 
             $internetPrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->internetPriceKey);
             if (is_null($internetPrice)) {
-                throw new PriceNotFoundException("Price of type `{$this->internetPriceKey}` was not found.");
+                throw new PriceNotFoundException("Price of type `{$this->internetPriceKey}` was not found for product `{$data['Name']}` having SKU `{$data['Code']}``.");
             }
             $storePrice = $this->extractPriceFromPriceList($data['Prices']['Price'], $this->storePriceKey);
             if (is_null($storePrice)) {
-                throw new PriceNotFoundException("Price of type `{$this->storePriceKey}` was not found.");
+                throw new PriceNotFoundException("Price of type `{$this->storePriceKey}` was not found for product `{$data['Name']}` having SKU `{$data['Code']}``.");
             }
 
             $res[$sku] = [
