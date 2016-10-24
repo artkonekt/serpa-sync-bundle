@@ -42,17 +42,17 @@ abstract class AbstractTranslator
      *
      * @param   RemoteFactories   $remoteFactories   Factories used to create remote mode instances.
      * @param   Parser            $parser            Supplies data from files exposted by Serpa.
-     * @param   string            $imageFolder       The folder containing the image files of products.
+     * @param   array             $imageFolders      The folders containing the image files of products.
      * @param   string            $locale            The locale of the remote objects into which translatable values are imported.
      *
      * @return  static
      */
-    public static function create(RemoteFactories $remoteFactories, Parser $parser, $imageFolder, $locale)
+    public static function create(RemoteFactories $remoteFactories, Parser $parser, array $imageFolders, $locale)
     {
         $instance = new static();
         $instance->remoteFactories = $remoteFactories;
         $instance->parser = $parser;
-        $instance->imageFolder = $imageFolder;
+        $instance->imageFolders = $imageFolders;
         $instance->locale = $locale;
 
         return $instance;
@@ -79,13 +79,13 @@ abstract class AbstractTranslator
     }
 
     /**
-     * Returns the folder that contains product images.
+     * Returns the folders that contains product images.
      *
-     * @return string
+     * @return array
      */
-    public function getImageFolder()
+    public function getImageFolders()
     {
-        return $this->imageFolder;
+        return $this->imageFolders;
     }
 
     /**

@@ -147,7 +147,7 @@ class ProductTranslator extends AbstractTranslator
     }
 
     /**
-     * Asssign product images to a remote product.
+     * Asssign product images to a remote product. Images are looked up in the list of image folders.
      *
      * @param   RemoteProductInterface   $product
      * @param   array                    $data
@@ -157,10 +157,16 @@ class ProductTranslator extends AbstractTranslator
     private function assignImages(RemoteProductInterface $product, array $data)
     {
         foreach ($data['images'] as $image) {
-            /** @var RemoteImageInterface $remoteImage */
-            $imagePath = $this->getImageFolder() . DIRECTORY_SEPARATOR . $image;
-            $remoteImage = $this->getRemoteFactories()->getImageFactory()->createFromFile($imagePath);
-            $product->addImage($remoteImage);
+            // Looking up the image in the list of folders from configuration, stopping at first folder containing it.
+            foreach ($this->getImageFolders() as $folder) {
+                $imagePath = $folder . DIRECTORY_SEPARATOR . $image;
+                if (file_exists($imagePath) && 0 < filesize($imagePath)) {
+                    /** @var RemoteImageInterface $remoteImage */
+                    $remoteImage = $this->getRemoteFactories()->getImageFactory()->createFromFile($imagePath);
+                    $product->addImage($remoteImage);
+                    break;  // take next image
+                }
+            }
         }
 
         return $product;

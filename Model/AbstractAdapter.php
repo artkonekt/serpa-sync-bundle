@@ -69,7 +69,7 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      * @param   TaxonFactory      $taxonFactory      Factory service used to create remote Sylius Sync Bundle taxons.
      * @param   StockFactory      $stockFactory      Factory service used to create remote Sylius Sync Bundle stocks.
      * @param   array             $inputFiles        The list of files exported by sERPa.
-     * @param   string            $imagesFolder      The folder containing product images to import.
+     * @param   array             $imageFolders      The folders containing product images to import.
      * @param   string            $locale            The locale of the translation into which to copy the translations.
      *
      * @return  static
@@ -78,7 +78,7 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      * @throws InvalidImagesFolder                   When the folder containing the product images either does not exist or it is not a folder.
      */
     public static function create(ProductFactory $productFactory, ImageFactory $imageFactory, TaxonomyFactory $taxonomyFactory,
-                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles, $imagesFolder, $locale,
+                                  TaxonFactory $taxonFactory, StockFactory $stockFactory, array $inputFiles, array $imageFolders, $locale,
                                   $internetPriceKey, $storePriceKey)
     {
         $instance = new static();
@@ -93,11 +93,13 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
 
         $instance->inputFiles = $inputFiles;
 
-        if (!file_exists($imagesFolder) || !is_dir($imagesFolder)) {
-            throw new InvalidImagesFolder("The images folder '$imagesFolder' either does not exist or it is not a folder.");
+        foreach ($imageFolders as $folder) {
+            if (!file_exists($folder) || !is_dir($folder)) {
+                throw new InvalidImagesFolder("The image folder '$folder' either does not exist or it is not a folder.");
+            }
         }
 
-        $instance->imagesFolder = $imagesFolder;
+        $instance->imageFolders = $imageFolders;
 
         $instance->remoteFactories = RemoteFactories::create($productFactory, $imageFactory, $taxonomyFactory, $taxonFactory, $stockFactory);
         $instance->locale = $locale;
@@ -206,7 +208,7 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
         return $class::create(
             $this->remoteFactories,
             $this->parser,
-            $this->imagesFolder,
+            $this->imageFolders,
             $this->locale);
     }
 
