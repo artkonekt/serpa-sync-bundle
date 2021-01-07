@@ -270,6 +270,14 @@ class ProductTranslator extends AbstractTranslator
 
     private function extractPriceFromPriceList(array $list, $type)
     {
+        if (array_key_exists('@Type', $list)) {
+            if ($type == $list['@Type']) {
+                return $list['Value'];
+            }
+
+            return null;
+        }
+
         foreach ($list as $priceInfo) {
             if ($type == $priceInfo['@Type']) {
                 return $priceInfo['Value'];
