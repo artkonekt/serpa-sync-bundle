@@ -15,4 +15,5 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class KonektSerpaSyncBundle extends Bundle
 {
+    const VERSION = '1.1.0';
 }

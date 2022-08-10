@@ -1,7 +1,7 @@
 # Serpa Sync Bundle Changelog
 
-## Unreleased
-### 2022-XX-YY
+## 1.1.0
+### 2022-08-10
 
 - Added Changelog
 - Added feature to exclude special prices by name pattern, eg.: `^(?!.*WhiskyNet).*$` excludes special prices if their name doesn't contain the word "WhiskyNet"
