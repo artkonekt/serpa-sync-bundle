@@ -35,6 +35,14 @@ class ProductTranslator extends AbstractTranslator
     /** @var  string */
     public $storePriceKey;
 
+    /** @var string|null */
+    private $specialPriceFilter = null;
+
+    public function setSpecialPriceFilterExpression(string $specialPriceFilter)
+    {
+        $this->specialPriceFilter = $specialPriceFilter;
+    }
+
     /**
      * Translates product from XML files to remote product instances.
      *
@@ -258,7 +266,7 @@ class ProductTranslator extends AbstractTranslator
                 'vatPercent' => $data['VATPercent'],
                 'internetPrice' => $internetPrice,
                 'storePrice' => $storePrice,
-                'specialPrice' => $specialPrice ? $specialPrice : null,
+                'specialPrice' => $specialPrice ?: null,
                 'taxonIds' => $this->collectTaxonIdsOfProduct($data),
                 'images' => $this->collectImagesOfProduct($data),
                 'categories' => $this->collectCategoriesOfProduct($data)
@@ -298,8 +306,10 @@ class ProductTranslator extends AbstractTranslator
         $res = [];
 
         foreach ($this->parser->getSpecialPrices() as $item) {
-            $id = $item['Product']['@ID'];
-            $res[$id] = $item['Price'];
+            if ($this->specialPriceIsNotFiltered($item)) {
+                $id = $item['Product']['@ID'];
+                $res[$id] = $item['Price'];
+            }
         }
 
         return $res;
@@ -330,18 +340,17 @@ class ProductTranslator extends AbstractTranslator
     /**
      * Returns the special price of a product or null if it is not defined.
      *
-     * @param    $id             The array parsed from XML data.
-     * @param    $specialPrices   The list of special prices having product ids as keys.
+     * @param $id  string The array parsed from XML data.
      *
-     * @return   float|null
+     * @return float|null
      */
-    private function collectSpecialPriceOfProduct($id, array $specialPrices)
+    private function collectSpecialPriceOfProduct($id)
     {
         if (!$this->specialPrices) {
             $this->specialPrices = $this->collectSpecialPrices();
         }
 
-        return isset($specialPrices[$id]) ? $specialPrices[$id] : null;
+        return $this->specialPrices[$id] ?? null;
     }
 
     /**
@@ -432,4 +441,12 @@ class ProductTranslator extends AbstractTranslator
         return $res;
     }
 
+    private function specialPriceIsNotFiltered(array $item): bool
+    {
+        if (null === $this->specialPriceFilter) {
+            return true;
+        }
+
+        return (bool) preg_match($this->specialPriceFilter, $item['Name']);
+    }
 }

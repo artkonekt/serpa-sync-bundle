@@ -4,6 +4,7 @@
 ### 2022-XX-YY
 
 - Added Changelog
+- Added feature to exclude special prices by name pattern, eg.: `^(?!.*WhiskyNet).*$` excludes special prices if their name doesn't contain the word "WhiskyNet"
 - Bumped minimum Sylius Sync Bundle Requirement to v1.0.1
 - Bumped minimum PHP requirement to 7.0
 

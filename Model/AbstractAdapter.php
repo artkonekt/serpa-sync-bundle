@@ -129,12 +129,14 @@ abstract class AbstractAdapter implements RemoteAdapterInterface
      *
      * @return RemoteProductInterface[]
      */
-    public function fetchProducts()
+    public function fetchProducts(string $specialPriceFilter = null)
     {
         if (!array_key_exists('products', $this->cache)) {
+            /** @var ProductTranslator $translator */
             $translator = $this->createTranslatorInstance(ProductTranslator::class);
             $translator->internetPriceKey = $this->internetPriceKey;
             $translator->storePriceKey = $this->storePriceKey;
+            $translator->setSpecialPriceFilterExpression($specialPriceFilter);
             $res = $translator->translate();
             $this->cache['products'] = $res;
         }

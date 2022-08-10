@@ -30,7 +30,7 @@ class XmlDataSource extends AbstractDataSource
         $decoder = new XmlDecoder();
         $result = $decoder->decode(file_get_contents($this->file));
         
-        return $result ? $result : [];
+        return $result ?: [];
     }
 
 }
