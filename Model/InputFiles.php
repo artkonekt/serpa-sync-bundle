@@ -45,7 +45,7 @@ class InputFiles
     /**
      * Returns true if a file exists, false otherwise.
      *
-     * @param $fileName The name of the file whose existence to check.
+     * @param $fileName string The name of the file whose existence to check.
      *
      * @return bool
      */
@@ -57,7 +57,7 @@ class InputFiles
     /**
      * Gets the file path by its name or null if the file does not exist.
      *
-     * @param $fileName The file name identifying the file.
+     * @param $fileName string The file name identifying the file.
      *
      * @return null|string
      */
@@ -69,7 +69,7 @@ class InputFiles
     /**
      * Imports a file. The file name will be stored as the key, the parameter as the value.
      *
-     * @param $file The file name with or without path information.
+     * @param $file string The file name with or without path information.
      *
      * @throws InvalidInputFile  When the file name could not be determined.
      * @throws DuplicateInputFileName  When a file with this name was already added.
