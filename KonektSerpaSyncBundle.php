@@ -13,7 +13,6 @@ namespace Konekt\SerpaSyncBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class KonektSyliusSyncBundle extends Bundle
+class KonektSerpaSyncBundle extends Bundle
 {
-
 }
