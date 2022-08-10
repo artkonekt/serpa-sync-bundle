@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "konekt/sylius-sync-bundle": "^1.0",
+        "php": "^7.0",
+        "konekt/sylius-sync-bundle": "^1.0.1",
         "friendsofsymfony/rest-bundle": "~1.7"
     },
     "require-dev": {
@@ -21,6 +21,11 @@
     "autoload": {
         "psr-4": {
             "Konekt\\SerpaSyncBundle\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
         }
     }
 }
