@@ -447,6 +447,6 @@ class ProductTranslator extends AbstractTranslator
             return true;
         }
 
-        return (bool) preg_match($this->specialPriceFilter, $item['Name']);
+        return ! (bool) preg_match(sprintf('/%s/', $this->specialPriceFilter), $item['Name']);
     }
 }
