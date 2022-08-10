@@ -31,7 +31,6 @@
 
 # PHPUnit
 /app/phpunit.xml
-/phpunit.xml
 
 # Build data
 /build/
@@ -40,3 +39,5 @@
 /composer.phar
 
 .idea
+
+composer.lock
