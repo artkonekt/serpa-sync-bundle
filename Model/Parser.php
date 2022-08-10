@@ -1,21 +1,21 @@
 <?php
 /**
- * Contains the AbstractParser class.
+ * Contains the Parser class.
  *
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-01
+ * @version     2016-05-03
  * @since       2016-03-01
  */
 
 namespace Konekt\SerpaSyncBundle\Model;
 
 /**
- * Parses files exported by sERPa and returns a PHP array containing data ready to be translated to remote model instances.
+ * Parses files exported by sERPa and returns a data ready to be translated to remote model instances.
  *
  */
-abstract class AbstractParser
+class Parser
 {
 
     /** @var InputFiles */
@@ -26,7 +26,7 @@ abstract class AbstractParser
     /**
      * Creates a new instance of the class.
      *
-     * @param   InputFiles   $inputFiles   File containing sERPa data.
+     * @param   InputFiles   $inputFiles   File containing data to parse.
      *
      * @return  static
      */
@@ -39,10 +39,13 @@ abstract class AbstractParser
     }
 
     /**
-     * Parses the input files and returns data ready to be mapped to remote model instances.
+     * Returns the list of files that are parsed.
      *
-     * @return array
+     * @return InputFiles
      */
-    abstract public function getAsArray();
+    public function getInputFiles()
+    {
+        return $this->inputFiles;
+    }
 
 }

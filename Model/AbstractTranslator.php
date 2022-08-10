@@ -5,11 +5,16 @@
  * @author      Sandor Teglas
  * @copyright   Copyright (c) 2016 Storm Storez Srl-d
  * @license     MIT
- * @version     2016-03-04
+ * @version     2016-05-03
  * @since       2016-03-01
  */
 
 namespace Konekt\SerpaSyncBundle\Model;
+
+use Konekt\SerpaSyncBundle\Model\Exception\InvalidParserException;
+use Konekt\SyliusSyncBundle\Model\Remote\Product\RemoteProductInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Stock\RemoteStockInterface;
+use Konekt\SyliusSyncBundle\Model\Remote\Taxonomy\RemoteTaxonomyInterface;
 
 /**
  * Translates array data to remote model instances.
@@ -21,33 +26,83 @@ abstract class AbstractTranslator
     /** @var RemoteFactories */
     protected $remoteFactories;
 
+    /** @var Parser */
+    protected $parser;
+
+    /** @var  string */
+    protected $imageFolder;
+
     /** @var  string */
     protected $locale;
+
+    protected function __construct() {}
 
     /**
      * Creates a new instance of the class.
      *
      * @param   RemoteFactories   $remoteFactories   Factories used to create remote mode instances.
-     * @param   string            $locale            The locale of the translation into which to copy the translations.
+     * @param   Parser            $parser            Supplies data from files exposted by Serpa.
+     * @param   array             $imageFolders      The folders containing the image files of products.
+     * @param   string            $locale            The locale of the remote objects into which translatable values are imported.
      *
      * @return  static
      */
-    public static function create(RemoteFactories $remoteFactories, $locale)
+    public static function create(RemoteFactories $remoteFactories, Parser $parser, array $imageFolders, $locale)
     {
         $instance = new static();
         $instance->remoteFactories = $remoteFactories;
+        $instance->parser = $parser;
+        $instance->imageFolders = $imageFolders;
         $instance->locale = $locale;
 
         return $instance;
     }
 
     /**
-     * Translates array data to a remote model instance.
+     * Returns the factories used to build remote object instances.
      *
-     * @param   array   $data
-     *
-     * @return  mixed
+     * @return  RemoteFactories
      */
-    abstract public function translate(array $data);
+    public function getRemoteFactories()
+    {
+        return $this->remoteFactories;
+    }
+
+    /**
+     * Returns the parser instance that loads data from files exposrted by Serpa.
+     *
+     * @return  Parser
+     */
+    public function getParser()
+    {
+        return $this->parser;
+    }
+
+    /**
+     * Returns the folders that contains product images.
+     *
+     * @return array
+     */
+    public function getImageFolders()
+    {
+        return $this->imageFolders;
+    }
+
+    /**
+     * Returns the locale of the remote objects into which translatable values are imported.
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
+     * Translates data supplied by the parser into remote instances.
+     *
+     * @return  mixed[]
+     */
+    abstract public function translate();
 
 }

@@ -6,7 +6,7 @@
  * @copyright   Copyright (c) 2016 Storm Storez Srl
  * @license     MIT
  * @since       2016-03-01
- * @version     2016-03-02
+ * @version     2016-04-08
  */
 
 namespace Konekt\SerpaSyncBundle\Model;
@@ -79,7 +79,7 @@ class RemoteFactories
      *
      * @return ProductFactory
      */
-    public function getImageFactoryFactory()
+    public function getImageFactory()
     {
         return $this->imageFactory;
     }

@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "33e29b87fd9cc5b983df48a73f275e9b",
-    "content-hash": "1c4314e1f2d330e991c2407442592a3f",
+    "hash": "c4463236fca64a50793af51e61e0d250",
+    "content-hash": "a011c1d91901514006f27de46169edc0",
     "packages": [
         {
             "name": "konekt/sylius-sync-bundle",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkonekt/sylius-sync-bundle.git",
-                "reference": "fe2864c648971fc058994d8554549061a3a2a0c0"
+                "reference": "5a11836e37258af449de450bb66b382dc4312b85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkonekt/sylius-sync-bundle/zipball/fe2864c648971fc058994d8554549061a3a2a0c0",
-                "reference": "fe2864c648971fc058994d8554549061a3a2a0c0",
+                "url": "https://api.github.com/repos/artkonekt/sylius-sync-bundle/zipball/5a11836e37258af449de450bb66b382dc4312b85",
+                "reference": "5a11836e37258af449de450bb66b382dc4312b85",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
             "keywords": [
                 "sylius"
             ],
-            "time": "2016-03-08 13:34:20"
+            "time": "2016-04-01 07:01:23"
         }
     ],
     "packages-dev": [
